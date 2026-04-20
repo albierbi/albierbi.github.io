@@ -1,58 +1,22 @@
 const writeups = [
-  {
-    title: "Mr Robot CTF",
-    platform: "thm",
-    difficulty: "medium",
-    desc: "WordPress exploitation, brute-forcing, and privilege escalation through a Mr. Robot-themed machine.",
-    tags: ["web", "wordpress", "privesc"],
-    date: "2025-04-01",
-    href: "thm-mrrobot.html"
-  },
-  {
-    title: "Basic Pentesting",
-    platform: "thm",
-    difficulty: "easy",
-    desc: "Enumeration, SSH brute-force, and privilege escalation via a weak sudo configuration.",
-    tags: ["enum", "ssh", "privesc"],
-    date: "2025-01-10",
-    href: "thm-basic-pentesting.html"
-  },
-  {
-    title: "Network Services",
-    platform: "thm",
-    difficulty: "medium",
-    desc: "Deep dive into SMB, Telnet, FTP enumeration and exploitation basics.",
-    tags: ["smb", "ftp", "network"],
-    date: "2025-02-03",
-    href: "thm-network-services.html"
-  },
-  {
-    title: "Starting Point — Meow",
-    platform: "htb",
-    difficulty: "easy",
-    desc: "First HTB machine. Telnet misconfiguration giving direct root access.",
-    tags: ["telnet", "enum"],
-    date: "2025-03-15",
-    href: "htb-meow.html"
-  },
-  {
-    title: "picoCTF 2025 — Buffer Overflow",
-    platform: "ctf",
-    difficulty: "medium",
-    desc: "Stack overflow challenge. Buffer analysis and crafting a basic ret2win payload.",
-    tags: ["pwn", "bof", "reversing"],
-    date: "2025-03-22",
-    href: "pico2025-bof.html"
-  },
-  {
-    title: "Advent of Cyber 2024 — Day 1",
-    platform: "thm",
-    difficulty: "easy",
-    desc: "Introduction to OPSEC concepts through a fictional scenario involving malicious YouTube links.",
-    tags: ["opsec", "osint", "recon"],
-    date: "2024-12-01",
-    href: "thm-advent-2024-day1.html"
-  }
+ {
+  title: "Basic Pentesting",
+  platform: "thm",
+  difficulty: "easy",
+  desc: "Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.",
+  tags: ["enum", "ssh", "hydra", "john", "privesc"],
+  date: "2025-01-10",
+  href: "thm-basic-pentesting.html"
+ },
+ {
+  title: "mKingdom",
+  platform: "thm",
+  difficulty: "medium",
+  desc: "PHP reverse shell via CMS file upload misconfiguration, lateral movement through plaintext creds found with linpeas, root via cronjob hijacking through /etc/hosts poisoning.",
+  tags: ["web", "php", "reverse-shell", "linpeas", "privesc", "cronjob"],
+  date: "2025-07-06",
+  href: "thm-mkingdom.html"
+ }
 ];
 
 const platformLabel = { thm: "TryHackMe", htb: "HackTheBox", ctf: "CTF" };
