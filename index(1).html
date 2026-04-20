@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>Alberto Erbusti | Security & CS</title>
+  <meta name="description" content="CS Student & Cybersecurity enthusiast. Building skills in security, systems, and software.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="#"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#writeups">Writeups</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <p class="hero-tag">CS Student &amp; Security Enthusiast</p>
+      <h1 class="hero-name">
+        <span class="first">Alberto</span><br>
+        <span class="last">Erbusti</span>
+      </h1>
+      <p class="hero-sub">
+        Studying Computer Science with a focus on cybersecurity.
+        Building knowledge in systems, networks, and offensive security &mdash;
+        one writeup at a time.
+      </p>
+      <div class="hero-actions">
+        <a href="#writeups" class="btn btn-primary">View Writeups &rarr;</a>
+        <a href="#about" class="btn btn-ghost">About me</a>
+      </div>
+    </div>
+    <div class="hero-status">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>HTTPS enforced</span>
+      </div>
+      <div class="status-item">
+        <span class="accent-text">A+</span>
+        <span>securityheaders.com</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="reveal">
+      <p class="section-label">about</p>
+      <h2 class="section-title">Who I am</h2>
+      <div class="section-divider"></div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>
+            I'm a 23-year-old originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
+            I'm pursuing a remote Bachelor's in Computer Science with a focus on cybersecurity,
+            coming from an engineering background.
+          </p>
+          <p>
+            I work closing shifts at a restaurant while studying &mdash; which means I've had to get good
+            at making mornings count. My approach to security is hands-on: labs, CTFs, and writeups
+            rather than just theory.
+          </p>
+          <p>
+            Currently working through OS internals, algorithms, and discrete math &mdash;
+            while exploring the offensive side of security in my own time.
+          </p>
+        </div>
+        <div>
+          <div class="skills-grid">
+            <div class="skill-item">Linux</div>
+            <div class="skill-item">Python</div>
+            <div class="skill-item">Networking</div>
+            <div class="skill-item">C</div>
+            <div class="skill-item">TryHackMe</div>
+            <div class="skill-item">Wireshark</div>
+            <div class="skill-item">Nmap</div>
+            <div class="skill-item">Git</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="writeups">
+    <div class="reveal">
+      <p class="section-label">writeups</p>
+      <h2 class="section-title">Latest writeups</h2>
+      <div class="section-divider"></div>
+      <div class="writeups-preview-grid">
+
+        <a class="writeup-card" href="writeups/thm-mrrobot.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-medium">medium</span>
+          </div>
+          <div class="card-title">Mr Robot CTF</div>
+          <div class="card-desc">WordPress exploitation, brute-forcing, and privilege escalation through a Mr. Robot-themed machine.</div>
+          <div class="card-tags">
+            <span class="tag">web</span>
+            <span class="tag">wordpress</span>
+            <span class="tag">privesc</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="writeups/thm-basic-pentesting.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Basic Pentesting</div>
+          <div class="card-desc">Enumeration, SSH brute-force, and privilege escalation via a weak sudo configuration.</div>
+          <div class="card-tags">
+            <span class="tag">enum</span>
+            <span class="tag">ssh</span>
+            <span class="tag">privesc</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="writeups/htb-meow.html">
+          <div class="card-top">
+            <span class="platform-badge badge-htb">HackTheBox</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Starting Point &mdash; Meow</div>
+          <div class="card-desc">First HTB machine. Telnet misconfiguration giving direct root access.</div>
+          <div class="card-tags">
+            <span class="tag">telnet</span>
+            <span class="tag">enum</span>
+          </div>
+        </a>
+
+      </div>
+      <div class="writeups-cta">
+        <a href="writeups.html" class="btn btn-ghost">All writeups &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="reveal">
+      <p class="section-label">contact</p>
+      <h2 class="section-title">Get in touch</h2>
+      <div class="section-divider"></div>
+      <p class="contact-intro">
+        Open to connecting with people in the security community, study groups, or anyone who wants to talk shop.
+      </p>
+      <div class="contact-links">
+        <a class="contact-link" href="https://linkedin.com/in/albertoerbusti" target="_blank" rel="noopener noreferrer">
+          <span class="link-icon">[in]</span>
+          <span>LinkedIn</span>
+        </a>
+        <a class="contact-link" href="https://github.com/albierbi" target="_blank" rel="noopener noreferrer">
+          <span class="link-icon">{gh}</span>
+          <span>GitHub</span>
+        </a>
+        <a class="contact-link" href="https://tryhackme.com" target="_blank" rel="noopener noreferrer">
+          <span class="link-icon">[thm]</span>
+          <span>TryHackMe</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <span class="accent-text">albertoerbusti.com</span>
+  </footer>
+
+  <script src="main.js"></script>
+
+</body>
+</html>
