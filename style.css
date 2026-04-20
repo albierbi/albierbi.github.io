@@ -374,17 +374,19 @@ section {
 #contact  { border-top: 1px solid var(--border); }
 
 .about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .about-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
   }
+}
 
   .skills-grid {
     grid-template-columns: 1fr 1fr;
@@ -437,10 +439,17 @@ section {
 }
 
 .writeups-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .writeups-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
 }
 
 .writeups-cta { text-align: center; padding-top: 1rem; }
