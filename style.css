@@ -380,6 +380,21 @@ section {
   align-items: start;
 }
 
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .writeups-preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .about-text p {
   color: var(--subtle);
   font-size: 0.95rem;
