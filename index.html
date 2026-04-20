@@ -1,38 +1,684 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
-    <title>Alberto Erbusti | Security & CS</title>
-    <meta name="description" content="Portfolio of Albierbi - CS Student & Cybersecurity Enthusiast">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-        header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-        h1 { margin: 0; }
-        .status { color: green; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+  <title>Alberto Erbusti | Security & CS</title>
+  <meta name="description" content="CS Student & Cybersecurity enthusiast. Building skills in security, systems, and software.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0c0f;
+      --bg2:      #111318;
+      --bg3:      #1a1d24;
+      --border:   #22262e;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --subtle:   #94a3b8;
+      --accent:   #38bdf8;
+      --accent2:  #818cf8;
+      --green:    #34d399;
+      --mono:     "Courier New", Courier, monospace;
+      --sans:     -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 60px;
+      background: rgba(10, 12, 15, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-logo span { color: var(--muted); }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 30%; left: 20%;
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(56,189,248,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 720px;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .hero-tag::before {
+      content: '> ';
+      color: var(--muted);
+    }
+
+    h1.hero-name {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.25s forwards;
+    }
+
+    h1.hero-name .first { color: var(--text); }
+    h1.hero-name .last {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--subtle);
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.55s forwards;
+    }
+
+    .btn {
+      font-size: 13px;
+      font-family: var(--sans);
+      padding: 10px 22px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0c0f;
+      border: 1px solid var(--accent);
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+      border-color: #7dd3fc;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--subtle);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .hero-status {
+      position: absolute;
+      bottom: 2rem; left: 2.5rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.8s forwards;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 6rem 2.5rem;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-label::before { content: '// '; color: var(--muted); }
+
+    h2.section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .section-divider {
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin-bottom: 3rem;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      color: var(--subtle);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .about-text p:last-child { margin-bottom: 0; }
+
+    .about-text strong { color: var(--text); font-weight: 500; }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .skill-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .skill-item:hover {
+      border-color: rgba(56,189,248,0.3);
+      color: var(--text);
+    }
+
+    .skill-item::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* ── WRITEUPS PREVIEW ── */
+    #writeups { border-top: 1px solid var(--border); }
+
+    .writeups-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .writeup-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .writeup-card:hover {
+      border-color: rgba(56,189,248,0.3);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .platform-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .badge-thm { background: #0f1929; color: #38bdf8; border: 1px solid #1e3a5f; }
+    .badge-htb { background: #0a1f12; color: #34d399; border: 1px solid #14532d; }
+    .badge-ctf { background: #1a1030; color: #818cf8; border: 1px solid #3730a3; }
+
+    .diff-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .diff-easy   { color: #34d399; background: #052e16; }
+    .diff-medium { color: #fbbf24; background: #1c1003; }
+    .diff-hard   { color: #f87171; background: #1f0a0a; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 0.85rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .writeups-cta {
+      text-align: center;
+      padding-top: 1rem;
+    }
+
+    /* ── CONTACT ── */
+    #contact { border-top: 1px solid var(--border); }
+
+    .contact-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-decoration: none;
+      color: var(--subtle);
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .contact-link:hover {
+      border-color: rgba(56,189,248,0.4);
+      color: var(--text);
+    }
+
+    .contact-link .link-icon {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { gap: 1.25rem; }
+      #hero { padding: 0 1.25rem; }
+      section { padding: 4rem 1.25rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Alberto Erbusti</h1>
-        <p>CS Student | Cybersecurity Focus</p>
-    </header>
-    
-    <main>
-        <h2>Welcome!</h2>
-        <p>This site is under construction. I'm currently studying Computer Science with a focus on Cybersecurity.</p>
-        
-        <h3>Status:</h3>
-        <ul>
-            <li>Domain: <span class="status">Connected</span></li>
-            <li>HTTPS: <span class="status">Enforced</span></li>
-            <li>Projects: <span style="color:orange">In Progress</span></li>
-        </ul>
-    </main>
 
-    <footer style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.8em;">
-        <p>&copy; 2026 Albierbi. Built on GitHub Pages.</p>
-    </footer>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#writeups">Writeups</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <p class="hero-tag">CS Student &amp; Security Enthusiast</p>
+      <h1 class="hero-name">
+        <span class="first">Alberto</span><br>
+        <span class="last">Erbusti</span>
+      </h1>
+      <p class="hero-sub">
+        Studying Computer Science with a focus on cybersecurity.
+        Building knowledge in systems, networks, and offensive security —
+        one writeup at a time.
+      </p>
+      <div class="hero-actions">
+        <a href="#writeups" class="btn btn-primary">View Writeups →</a>
+        <a href="#about" class="btn btn-ghost">About me</a>
+      </div>
+    </div>
+    <div class="hero-status">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>HTTPS enforced</span>
+      </div>
+      <div class="status-item">
+        <span style="color: var(--accent)">A+</span>
+        <span>securityheaders.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="reveal">
+      <p class="section-label">about</p>
+      <h2 class="section-title">Who I am</h2>
+      <div class="section-divider"></div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>
+            I'm a 23-year-old originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
+            I'm pursuing a remote Bachelor's in Computer Science with a focus on cybersecurity,
+            coming from an engineering background.
+          </p>
+          <p>
+            I work closing shifts at a restaurant while studying — which means I've had to get good
+            at making mornings count. My approach to security is hands-on: labs, CTFs, and writeups
+            rather than just theory.
+          </p>
+          <p>
+            Currently working through OS internals, algorithms, and discrete math —
+            while exploring the offensive side of security in my own time.
+          </p>
+        </div>
+        <div>
+          <div class="skills-grid">
+            <div class="skill-item">Linux</div>
+            <div class="skill-item">Python</div>
+            <div class="skill-item">Networking</div>
+            <div class="skill-item">C</div>
+            <div class="skill-item">TryHackMe</div>
+            <div class="skill-item">Wireshark</div>
+            <div class="skill-item">Nmap</div>
+            <div class="skill-item">Git</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITEUPS PREVIEW -->
+  <section id="writeups">
+    <div class="reveal">
+      <p class="section-label">writeups</p>
+      <h2 class="section-title">Latest writeups</h2>
+      <div class="section-divider"></div>
+      <div class="writeups-preview-grid">
+
+        <a class="writeup-card" href="writeups/thm-mrrobot.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-medium">medium</span>
+          </div>
+          <div class="card-title">Mr Robot CTF</div>
+          <div class="card-desc">WordPress exploitation, brute-forcing, and privilege escalation through a Mr. Robot-themed machine.</div>
+          <div class="card-tags">
+            <span class="tag">web</span>
+            <span class="tag">wordpress</span>
+            <span class="tag">privesc</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="writeups/thm-basic-pentesting.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Basic Pentesting</div>
+          <div class="card-desc">Enumeration, SSH brute-force, and privilege escalation via a weak sudo configuration.</div>
+          <div class="card-tags">
+            <span class="tag">enum</span>
+            <span class="tag">ssh</span>
+            <span class="tag">privesc</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="writeups/htb-meow.html">
+          <div class="card-top">
+            <span class="platform-badge badge-htb">HackTheBox</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Starting Point — Meow</div>
+          <div class="card-desc">First HTB machine. Telnet misconfiguration giving direct root access.</div>
+          <div class="card-tags">
+            <span class="tag">telnet</span>
+            <span class="tag">enum</span>
+          </div>
+        </a>
+
+      </div>
+      <div class="writeups-cta">
+        <a href="writeups.html" class="btn btn-ghost">All writeups →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="reveal">
+      <p class="section-label">contact</p>
+      <h2 class="section-title">Get in touch</h2>
+      <div class="section-divider"></div>
+      <p style="color: var(--subtle); font-size: 0.95rem; max-width: 480px;">
+        Open to connecting with people in the security community, study groups, or anyone who wants to talk shop.
+      </p>
+      <div class="contact-links">
+        <a class="contact-link" href="https://linkedin.com/in/albertoerbusti" target="_blank" rel="noopener">
+          <span class="link-icon">[in]</span>
+          <span>LinkedIn</span>
+        </a>
+        <a class="contact-link" href="https://github.com/albierbi" target="_blank" rel="noopener">
+          <span class="link-icon">{gh}</span>
+          <span>GitHub</span>
+        </a>
+        <a class="contact-link" href="https://tryhackme.com" target="_blank" rel="noopener">
+          <span class="link-icon">[thm]</span>
+          <span>TryHackMe</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <span style="color: var(--accent)">albertoerbusti.com</span>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
 </body>
 </html>
