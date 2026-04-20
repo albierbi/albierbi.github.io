@@ -6,7 +6,7 @@ const writeups = [
     desc: "WordPress exploitation, brute-forcing, and privilege escalation through a Mr. Robot-themed machine.",
     tags: ["web", "wordpress", "privesc"],
     date: "2025-04-01",
-    href: "writeups/thm-mrrobot.html"
+    href: "thm-mrrobot.html"
   },
   {
     title: "Basic Pentesting",
@@ -15,7 +15,7 @@ const writeups = [
     desc: "Enumeration, SSH brute-force, and privilege escalation via a weak sudo configuration.",
     tags: ["enum", "ssh", "privesc"],
     date: "2025-01-10",
-    href: "writeups/thm-basic-pentesting.html"
+    href: "thm-basic-pentesting.html"
   },
   {
     title: "Network Services",
@@ -24,7 +24,7 @@ const writeups = [
     desc: "Deep dive into SMB, Telnet, FTP enumeration and exploitation basics.",
     tags: ["smb", "ftp", "network"],
     date: "2025-02-03",
-    href: "writeups/thm-network-services.html"
+    href: "thm-network-services.html"
   },
   {
     title: "Starting Point — Meow",
@@ -33,7 +33,7 @@ const writeups = [
     desc: "First HTB machine. Telnet misconfiguration giving direct root access.",
     tags: ["telnet", "enum"],
     date: "2025-03-15",
-    href: "writeups/htb-meow.html"
+    href: "htb-meow.html"
   },
   {
     title: "picoCTF 2025 — Buffer Overflow",
@@ -42,7 +42,7 @@ const writeups = [
     desc: "Stack overflow challenge. Buffer analysis and crafting a basic ret2win payload.",
     tags: ["pwn", "bof", "reversing"],
     date: "2025-03-22",
-    href: "writeups/pico2025-bof.html"
+    href: "pico2025-bof.html"
   },
   {
     title: "Advent of Cyber 2024 — Day 1",
@@ -51,7 +51,7 @@ const writeups = [
     desc: "Introduction to OPSEC concepts through a fictional scenario involving malicious YouTube links.",
     tags: ["opsec", "osint", "recon"],
     date: "2024-12-01",
-    href: "writeups/thm-advent-2024-day1.html"
+    href: "thm-advent-2024-day1.html"
   }
 ];
 
@@ -60,30 +60,33 @@ const filters = { platform: "all", diff: "all" };
 
 function setFilter(type, value, btn) {
   filters[type] = value;
-  document.querySelectorAll('[data-filter="' + type + '"]').forEach(b => b.classList.remove("active"));
+  document.querySelectorAll('[data-filter="' + type + '"]').forEach(function(b) {
+    b.classList.remove("active");
+  });
   btn.classList.add("active");
   render();
 }
 
 function render() {
-  const q = document.getElementById("searchInput").value.toLowerCase().trim();
-  const grid = document.getElementById("grid");
+  var input = document.getElementById("searchInput");
+  var q = input ? input.value.toLowerCase().trim() : "";
+  var grid = document.getElementById("grid");
 
-  const filtered = writeups.filter(w => {
-    const matchPlatform = filters.platform === "all" || w.platform === filters.platform;
-    const matchDiff     = filters.diff === "all"     || w.difficulty === filters.diff;
-    const matchSearch   = !q
+  var filtered = writeups.filter(function(w) {
+    var matchPlatform = filters.platform === "all" || w.platform === filters.platform;
+    var matchDiff     = filters.diff === "all"     || w.difficulty === filters.diff;
+    var matchSearch   = !q
       || w.title.toLowerCase().includes(q)
       || w.desc.toLowerCase().includes(q)
-      || w.tags.some(t => t.includes(q));
+      || w.tags.some(function(t) { return t.includes(q); });
     return matchPlatform && matchDiff && matchSearch;
   });
 
   document.getElementById("resultsCount").textContent = filtered.length;
 
-  ["thm","htb","ctf"].forEach(p => {
-    document.getElementById("cnt-" + p).textContent =
-      writeups.filter(w => w.platform === p).length;
+  ["thm", "htb", "ctf"].forEach(function(p) {
+    var el = document.getElementById("cnt-" + p);
+    if (el) el.textContent = writeups.filter(function(w) { return w.platform === p; }).length;
   });
 
   if (filtered.length === 0) {
@@ -91,18 +94,31 @@ function render() {
     return;
   }
 
-  grid.innerHTML = filtered.map(w =>
-    '<a class="card" href="' + w.href + '">' +
+  grid.innerHTML = filtered.map(function(w) {
+    return '<a class="card" href="' + w.href + '">' +
       '<div class="card-top">' +
         '<span class="platform-badge badge-' + w.platform + '">' + platformLabel[w.platform] + '</span>' +
         '<span class="diff-badge diff-' + w.difficulty + '">' + w.difficulty + '</span>' +
       '</div>' +
       '<div class="card-title">' + w.title + '</div>' +
       '<div class="card-desc">' + w.desc + '</div>' +
-      '<div class="card-tags">' + w.tags.map(t => '<span class="tag">' + t + '</span>').join("") + '</div>' +
+      '<div class="card-tags">' + w.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join("") + '</div>' +
       '<div class="card-footer">' + w.date + '</div>' +
-    '</a>'
-  ).join("");
+    '</a>';
+  }).join("");
 }
 
-render();
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll(".filter-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      setFilter(btn.dataset.filter, btn.dataset.value, btn);
+    });
+  });
+
+  var searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", render);
+  }
+
+  render();
+});
