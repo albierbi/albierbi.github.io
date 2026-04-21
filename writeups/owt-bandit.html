@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>OverTheWire: Bandit | Alberto Erbusti</title>
+  <meta name="description" content="Full Bandit wargame walkthrough — all 33 levels covering Linux fundamentals, file manipulation, networking, git, and shell escaping.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+  <link rel="stylesheet" href="../owt.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../writeups/" class="active">Writeups</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="../writeups/">&larr; all writeups</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-owt">OverTheWire</span>
+        <span class="diff-badge diff-easy">beginner</span>
+      </div>
+      <h1 class="writeup-title">Bandit — Complete Walkthrough</h1>
+      <p class="writeup-subtitle">All 33 levels of the Bandit wargame. A progressive introduction to Linux, the command line, networking, and Git through hands-on challenges.</p>
+      <div class="writeup-tags">
+        <span class="tag">linux</span>
+        <span class="tag">bash</span>
+        <span class="tag">ssh</span>
+        <span class="tag">file-manipulation</span>
+        <span class="tag">networking</span>
+        <span class="tag">git</span>
+        <span class="tag">crypto</span>
+        <span class="tag">shell-escape</span>
+      </div>
+      <div class="writeup-date">Completed &mdash; 2026</div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// levels</div>
+      <ul>
+        <li><a href="#lv1">Lv 0&rarr;1</a></li>
+        <li><a href="#lv2">Lv 1&rarr;2</a></li>
+        <li><a href="#lv3">Lv 2&rarr;3</a></li>
+        <li><a href="#lv4">Lv 3&rarr;4</a></li>
+        <li><a href="#lv5">Lv 4&rarr;5</a></li>
+        <li><a href="#lv6">Lv 5&rarr;6</a></li>
+        <li><a href="#lv7">Lv 6&rarr;7</a></li>
+        <li><a href="#lv8">Lv 7&rarr;8</a></li>
+        <li><a href="#lv9">Lv 8&rarr;9</a></li>
+        <li><a href="#lv10">Lv 9&rarr;10</a></li>
+        <li><a href="#lv11">Lv 10&rarr;11</a></li>
+        <li><a href="#lv12">Lv 11&rarr;12</a></li>
+        <li><a href="#lv13">Lv 12&rarr;13</a></li>
+        <li><a href="#lv14">Lv 13&rarr;14</a></li>
+        <li><a href="#lv15">Lv 14&rarr;15</a></li>
+        <li><a href="#lv16">Lv 15&rarr;16</a></li>
+        <li><a href="#lv17">Lv 16&rarr;17</a></li>
+        <li><a href="#lv18">Lv 17&rarr;18</a></li>
+        <li><a href="#lv19">Lv 18&rarr;19</a></li>
+        <li><a href="#lv20">Lv 19&rarr;20</a></li>
+        <li><a href="#lv21">Lv 20&rarr;21</a></li>
+        <li><a href="#lv22">Lv 21&rarr;22</a></li>
+        <li><a href="#lv23">Lv 22&rarr;23</a></li>
+        <li><a href="#lv24">Lv 23&rarr;24</a></li>
+        <li><a href="#lv25">Lv 24&rarr;25</a></li>
+        <li><a href="#lv26">Lv 25&rarr;26</a></li>
+        <li><a href="#lv27">Lv 26&rarr;27</a></li>
+        <li><a href="#lv28">Lv 27&rarr;28</a></li>
+        <li><a href="#lv29">Lv 28&rarr;29</a></li>
+        <li><a href="#lv30">Lv 29&rarr;30</a></li>
+        <li><a href="#lv31">Lv 30&rarr;31</a></li>
+        <li><a href="#lv32">Lv 31&rarr;32</a></li>
+        <li><a href="#lv33">Lv 32&rarr;33</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="lv1">
+        <h2>Level 0 &rarr; 1</h2>
+        <p>Basic introduction to SSH and reading files. Connect to the server, list the directory contents with <code>ls</code>, then read the file with <code>cat</code>.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ssh bandit0@bandit.labs.overthewire.org -p 2220
+ls
+cat readme</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Tip</div>
+          <p>Use <code>file &lt;filename&gt;</code> to check what type of file something is before trying to read it. Use <code>exit</code> to disconnect.</p>
+        </div>
+      </section>
+
+      <section id="lv2">
+        <h2>Level 1 &rarr; 2</h2>
+        <p>The file is named <code>-</code>, which bash interprets as stdin rather than a filename. Prefix it with <code>./</code> to treat it as a file path.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cat ./-</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note</div>
+          <p>Running <code>cat -</code> makes bash wait for stdin input. Use <code>Ctrl+D</code> to signal end of file and exit that state.</p>
+        </div>
+      </section>
+
+      <section id="lv3">
+        <h2>Level 2 &rarr; 3</h2>
+        <p>The file has spaces in its name. Wrap the filename in quotes so the shell treats it as a single argument.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cat "spaces in this filename"</pre>
+        </div>
+      </section>
+
+      <section id="lv4">
+        <h2>Level 3 &rarr; 4</h2>
+        <p>The password is in a hidden file inside the <code>inhere</code> directory. Hidden files start with a dot and aren't shown by default.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cd inhere
+ls -la</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Lesson learned</div>
+          <p>When using <code>cd</code>, don't add a leading <code>/</code> for relative paths — <code>cd inhere</code> not <code>cd /inhere</code>. Alternatively, <code>find inhere</code> lists all files including hidden ones without needing to cd first.</p>
+        </div>
+      </section>
+
+      <section id="lv5">
+        <h2>Level 4 &rarr; 5</h2>
+        <p>Multiple files in <code>inhere</code>, only one is human-readable. Rather than opening each one, use <code>file</code> to check types and find the ASCII text file.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>file inhere/*
+cat inhere/-file07</pre>
+        </div>
+      </section>
+
+      <section id="lv6">
+        <h2>Level 5 &rarr; 6</h2>
+        <p>The file is somewhere in <code>inhere</code>, human-readable, 1033 bytes, non-executable. Use <code>find</code> with size and type flags.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>find inhere -size 1033c -readable ! -executable</pre>
+        </div>
+      </section>
+
+      <section id="lv7">
+        <h2>Level 6 &rarr; 7</h2>
+        <p>File is somewhere on the server, owned by <code>bandit7</code>, group <code>bandit6</code>, 33 bytes. Search from root and filter out permission errors.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>find / -size 33c -user bandit7 -group bandit6 2>/dev/null</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Tip</div>
+          <p>Results without <code>Permission denied</code> in front are the accessible ones. The <code>2&gt;/dev/null</code> redirects error messages so you only see real results.</p>
+        </div>
+      </section>
+
+      <section id="lv8">
+        <h2>Level 7 &rarr; 8</h2>
+        <p>Password is next to the word "millionth" in <code>data.txt</code>. Use <code>grep</code> to find it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>grep "millionth" data.txt</pre>
+        </div>
+      </section>
+
+      <section id="lv9">
+        <h2>Level 8 &rarr; 9</h2>
+        <p>Password is the only line that appears exactly once in <code>data.txt</code>. Sort first so <code>uniq</code> can detect duplicates, then filter for unique lines.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>sort data.txt | uniq -u</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Why sort first?</div>
+          <p><code>uniq</code> only detects adjacent duplicate lines — sorting groups identical lines together so <code>uniq -u</code> can find the one that's truly unique.</p>
+        </div>
+      </section>
+
+      <section id="lv10">
+        <h2>Level 9 &rarr; 10</h2>
+        <p>Password is one of the few human-readable strings in a binary file, preceded by several <code>=</code> signs.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>strings data.txt | grep "=="</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note</div>
+          <p><code>strings</code> extracts printable character sequences from binary files. Combined with <code>grep</code> it narrows down the output efficiently. Alternatively <code>grep -a ==== data.txt</code> works too — the <code>-a</code> flag forces grep to treat binary as text.</p>
+        </div>
+      </section>
+
+      <section id="lv11">
+        <h2>Level 10 &rarr; 11</h2>
+        <p>The file contains base64-encoded data. Decode it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>base64 -d data.txt</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note</div>
+          <p>Running <code>base64</code> without flags encodes. The <code>-d</code> flag decodes.</p>
+        </div>
+      </section>
+
+      <section id="lv12">
+        <h2>Level 11 &rarr; 12</h2>
+        <p>All letters have been rotated by 13 positions (ROT13). Use <code>tr</code> to reverse it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'</pre>
+        </div>
+      </section>
+
+      <section id="lv13">
+        <h2>Level 12 &rarr; 13</h2>
+        <p>A hexdump of a file that has been compressed multiple times. Create a working directory, reverse the hexdump, then iteratively decompress.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>mktemp -d /tmp/tmp.XXX
+cp data.txt /tmp/tmp.XXX/
+cd /tmp/tmp.XXX
+xxd -r data.txt > data.bin
+# Check type, then decompress accordingly:
+file data.bin
+tar -xf data.bin        # for tar
+gzip -d data.bin.gz     # for gzip
+bzip2 -d data.bin.bz2   # for bzip2
+# Repeat until you get ASCII text</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Tip</div>
+          <p>Use <code>tar -tvf &lt;file&gt;</code> to peek inside a tar archive without extracting. Use <code>file</code> after each extraction to know what to do next.</p>
+        </div>
+      </section>
+
+      <section id="lv14">
+        <h2>Level 13 &rarr; 14</h2>
+        <p>No password — instead you get an SSH private key to connect directly as bandit14.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ssh -p 2220 -i sshkey.private bandit14@bandit.labs.overthewire.org</pre>
+        </div>
+      </section>
+
+      <section id="lv15">
+        <h2>Level 14 &rarr; 15</h2>
+        <p>Submit the current level's password to port 30000 on localhost. Use netcat.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nc localhost 30000
+# paste the password and hit enter</pre>
+        </div>
+      </section>
+
+      <section id="lv16">
+        <h2>Level 15 &rarr; 16</h2>
+        <p>Same as before but the port uses SSL/TLS. Use <code>openssl s_client</code> instead of netcat.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>openssl s_client -connect localhost:30001</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Why s_client?</div>
+          <p><code>s_client</code> initiates a TLS connection and lets you send data interactively — essentially netcat but with TLS support.</p>
+        </div>
+      </section>
+
+      <section id="lv17">
+        <h2>Level 16 &rarr; 17</h2>
+        <p>Find which port between 31000-32000 speaks SSL and returns credentials. Scan with nmap, then connect with openssl.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nmap -sV -p 31000-32000 localhost
+openssl s_client -connect localhost:&lt;correct_port&gt;</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note</div>
+          <p>If openssl gives <code>KEYUPDATE</code> errors, try <code>ncat --ssl</code> or <code>socat</code> instead — they handle the TLS negotiation differently.</p>
+        </div>
+      </section>
+
+      <section id="lv18">
+        <h2>Level 17 &rarr; 18</h2>
+        <p>Two password files — find the one line that differs between them.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>diff -y passwords.old passwords.new</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note</div>
+          <p>The <code>-y</code> flag shows both files side by side, making it easy to spot the changed line.</p>
+        </div>
+      </section>
+
+      <section id="lv19">
+        <h2>Level 18 &rarr; 19</h2>
+        <p>The <code>.bashrc</code> has been modified to log you out immediately on login. Bypass it by not launching bash at all — pass a command directly to SSH.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ssh bandit18@bandit.labs.overthewire.org -p 2220 /bin/dash</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Why this works</div>
+          <p><code>.bashrc</code> only runs when bash starts. By launching <code>/bin/dash</code> directly instead, we skip bash entirely and the logout trap never fires.</p>
+        </div>
+      </section>
+
+      <section id="lv20">
+        <h2>Level 19 &rarr; 20</h2>
+        <p>A setuid binary in the home directory lets you run commands as bandit20. Use it to read the password file.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>./bandit20-do cat /etc/bandit_pass/bandit20</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">What is setuid?</div>
+          <p>A setuid binary runs with the permissions of its owner rather than the person executing it. If the owner is bandit20, running it lets you act as bandit20 for that command.</p>
+        </div>
+      </section>
+
+      <section id="lv21">
+        <h2>Level 20 &rarr; 21</h2>
+        <p><code>suconnect</code> connects to a port, expects to receive the current level's password, then returns the next one. You need to be both the server and client — set up a netcat listener first, then run suconnect against it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Terminal 1 — start listener with current password
+echo "CURRENT_PASSWORD" | nc -lvp 1234
+
+# Terminal 2 — run suconnect
+./suconnect 1234</pre>
+        </div>
+      </section>
+
+      <section id="lv22">
+        <h2>Level 21 &rarr; 22</h2>
+        <p>A cronjob is running periodically. Find it in <code>/etc/cron.d</code> and follow the path to see what it does and where it puts the password.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ls /etc/cron.d
+cat /etc/cron.d/cronjob_bandit22
+cat /usr/bin/cronjob_bandit22.sh</pre>
+        </div>
+      </section>
+
+      <section id="lv23">
+        <h2>Level 22 &rarr; 23</h2>
+        <p>Another cronjob — this one writes the password to a file whose name is derived from a bash script. Read the script, understand what filename it generates, then read that file.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cat /usr/bin/cronjob_bandit23.sh
+# The script runs: echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+# Run the same command yourself to get the filename
+echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+cat /tmp/&lt;resulting_hash&gt;</pre>
+        </div>
+        <div class="callout callout-warning">
+          <div class="callout-title">Lesson</div>
+          <p>Always run commands you find in suspicious scripts to understand what they produce. Never just read them passively.</p>
+        </div>
+      </section>
+
+      <section id="lv24">
+        <h2>Level 23 &rarr; 24</h2>
+        <p>A cronjob runs and deletes scripts in a directory after executing them. Write a script that copies the password to a readable location, drop it in that directory, and wait.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>mkdir /tmp/mydir
+cat > /tmp/mydir/myscript.sh &lt;&lt;EOF
+#!/bin/bash
+cat /etc/bandit_pass/bandit24 > /tmp/mydir/password
+EOF
+chmod 777 /tmp/mydir/myscript.sh
+cp /tmp/mydir/myscript.sh /var/spool/bandit24/foo/
+# Wait ~1 minute, then:
+cat /tmp/mydir/password</pre>
+        </div>
+        <div class="callout callout-warning">
+          <div class="callout-title">Important</div>
+          <p>Set permissions correctly with <code>chmod 777</code> — the cronjob runs as bandit24 and needs to be able to execute your script and write to your directory.</p>
+        </div>
+      </section>
+
+      <section id="lv25">
+        <h2>Level 24 &rarr; 25</h2>
+        <p>A daemon on port 30002 requires the current password plus a 4-digit PIN. Brute-force all 10000 combinations with a script.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>for i in $(seq -w 0000 9999); do
+  echo "CURRENT_PASSWORD $i"
+done | nc localhost 30002 | grep -v "Wrong"</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Why pipe after done?</div>
+          <p>Piping the entire loop output at once opens only one connection to netcat. If you piped inside the loop you'd open 10000 connections. The <code>-w</code> flag on <code>seq</code> zero-pads numbers so they're always 4 digits.</p>
+        </div>
+      </section>
+
+      <section id="lv26">
+        <h2>Level 25 &rarr; 26</h2>
+        <p>Bandit26's shell is not <code>/bin/bash</code> — check <code>/etc/passwd</code> to see it's set to <code>more</code>, which reads and exits immediately. To get a shell, shrink your terminal window to just 2 lines so <code>more</code> pauses, then use its <code>v</code> command to open vim, and from vim set the shell and spawn it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Shrink terminal to ~2 lines, then SSH in
+ssh -i bandit26.sshkey bandit26@localhost -p 2220
+# more pauses — press v to open vim
+# Inside vim:
+:set shell=/bin/bash
+:shell</pre>
+        </div>
+      </section>
+
+      <section id="lv27">
+        <h2>Level 26 &rarr; 27</h2>
+        <p>While inside bandit26's shell from the previous level, there's a setuid binary to run commands as bandit27.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>./bandit27-do cat /etc/bandit_pass/bandit27</pre>
+        </div>
+      </section>
+
+      <section id="lv28">
+        <h2>Level 27 &rarr; 28</h2>
+        <p>Clone a git repository and read the password from it.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>mkdir /tmp/myrepo && cd /tmp/myrepo
+git clone ssh://bandit27-git@localhost:2220/home/bandit27-git/repo
+cat repo/README</pre>
+        </div>
+      </section>
+
+      <section id="lv29">
+        <h2>Level 28 &rarr; 29</h2>
+        <p>The password in the repo has been redacted. Check the commit history — it was there before.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>git log
+git show &lt;commit_hash&gt;</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Lesson</div>
+          <p>Sensitive data committed to git is never truly deleted — it lives in the history. <code>git log</code> shows all commits, <code>git show &lt;hash&gt;</code> shows what a specific commit contained.</p>
+        </div>
+      </section>
+
+      <section id="lv30">
+        <h2>Level 29 &rarr; 30</h2>
+        <p>The password isn't in the main branch. Check other branches.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>git branch -a
+git checkout &lt;other_branch&gt;
+cat README.md</pre>
+        </div>
+      </section>
+
+      <section id="lv31">
+        <h2>Level 30 &rarr; 31</h2>
+        <p>Nothing useful in commits or branches. Check git tags.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>git tag
+git show &lt;tag_name&gt;</pre>
+        </div>
+      </section>
+
+      <section id="lv32">
+        <h2>Level 31 &rarr; 32</h2>
+        <p>Push a specific file to the remote repository. The <code>.gitignore</code> blocks <code>*.txt</code> — force-add it anyway.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>echo "May I come in?" > key.txt
+git add -f key.txt
+git commit -m "add key"
+git push origin master</pre>
+        </div>
+      </section>
+
+      <section id="lv33">
+        <h2>Level 32 &rarr; 33</h2>
+        <p>Dropped into an uppercase shell — every command you type gets uppercased, breaking everything. The trick: use a shell variable that references the shell itself.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>$0
+# Now in a normal shell
+cat /etc/bandit_pass/bandit33</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Why $0?</div>
+          <p><code>$0</code> is a special variable that holds the name of the current shell or script. Since it's a variable reference and not a command, uppercasing doesn't affect it — it still expands to the shell binary path and spawns a new normal shell.</p>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="../writeups/" class="footer-back">&larr; back to writeups</a>
+  </footer>
+
+</body>
+</html>
