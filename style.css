@@ -374,27 +374,10 @@ section {
 #contact  { border-top: 1px solid var(--border); }
 
 .about-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-@media (min-width: 768px) {
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
-}
-
-  .skills-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .writeups-preview-grid {
-    grid-template-columns: 1fr;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
 }
 
 .about-text p {
@@ -439,17 +422,10 @@ section {
 }
 
 .writeups-preview-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 12px;
   margin-bottom: 2rem;
-}
-
-@media (min-width: 768px) {
-  .writeups-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
 }
 
 .writeups-cta { text-align: center; padding-top: 1rem; }
@@ -630,6 +606,9 @@ section {
 .dot-purple { background: #818cf8; }
 .dot-yellow { background: #fbbf24; }
 .dot-red    { background: #f87171; }
+.dot-amber  { background: #f59e0b; }
+
+.badge-owt  { background: #1a1208; color: #f59e0b; border: 1px solid #78350f; }
 
 .empty-state::before {
 
@@ -660,10 +639,8 @@ section {
   nav { padding: 0 1.25rem; }
   .nav-links { gap: 1.25rem; }
   #hero { padding: 0 1.25rem; }
-  section { padding: 3rem 1.25rem; }
-  .about-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-  .skills-grid { grid-template-columns: 1fr 1fr; }
-  .writeups-preview-grid { grid-template-columns: 1fr; }
+  section { padding: 4rem 1.25rem; }
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
   footer { flex-direction: column; gap: 0.5rem; text-align: center; }
   .page-header { padding: 6rem 1.25rem 2rem; }
   .layout { grid-template-columns: 1fr; padding: 1.5rem 1.25rem 4rem; gap: 1.5rem; }
