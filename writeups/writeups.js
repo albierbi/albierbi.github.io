@@ -1,25 +1,34 @@
 const writeups = [
- {
-  title: "Basic Pentesting",
-  platform: "thm",
-  difficulty: "easy",
-  desc: "Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.",
-  tags: ["enum", "ssh", "hydra", "john", "privesc"],
-  date: "2025-01-10",
-  href: "thm-basic-pentesting.html"
- },
- {
-  title: "mKingdom",
-  platform: "thm",
-  difficulty: "medium",
-  desc: "PHP reverse shell via CMS file upload misconfiguration, lateral movement through plaintext creds found with linpeas, root via cronjob hijacking through /etc/hosts poisoning.",
-  tags: ["web", "php", "reverse-shell", "linpeas", "privesc", "cronjob"],
-  date: "2025-07-06",
-  href: "thm-mkingdom.html"
- }
+  {
+    title: "mKingdom",
+    platform: "thm",
+    difficulty: "medium",
+    desc: "PHP reverse shell via CMS file upload misconfiguration, lateral movement through plaintext creds found with linpeas, root via cronjob hijacking through /etc/hosts poisoning.",
+    tags: ["web", "php", "reverse-shell", "linpeas", "privesc", "cronjob"],
+    date: "2025-07-06",
+    href: "thm-mkingdom.html"
+  },
+  {
+    title: "Basic Pentesting",
+    platform: "thm",
+    difficulty: "easy",
+    desc: "Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.",
+    tags: ["enum", "ssh", "hydra", "john", "privesc", "smb"],
+    date: "2025-01-10",
+    href: "thm-basic-pentesting.html"
+  },
+  {
+    title: "OverTheWire: Bandit",
+    platform: "owt",
+    difficulty: "easy",
+    desc: "All 33 levels of the Bandit wargame covering Linux fundamentals, file manipulation, networking, SSH, and Git through hands-on challenges.",
+    tags: ["linux", "bash", "ssh", "git", "crypto", "shell-escape"],
+    date: "2026-04-20",
+    href: "owt-bandit.html"
+  }
 ];
 
-const platformLabel = { thm: "TryHackMe", htb: "HackTheBox", ctf: "CTF" };
+const platformLabel = { thm: "TryHackMe", htb: "HackTheBox", ctf: "CTF", owt: "OverTheWire" };
 const filters = { platform: "all", diff: "all" };
 
 function setFilter(type, value, btn) {
@@ -48,7 +57,7 @@ function render() {
 
   document.getElementById("resultsCount").textContent = filtered.length;
 
-  ["thm", "htb", "ctf"].forEach(function(p) {
+  ["thm", "htb", "ctf", "owt"].forEach(function(p) {
     var el = document.getElementById("cnt-" + p);
     if (el) el.textContent = writeups.filter(function(w) { return w.platform === p; }).length;
   });

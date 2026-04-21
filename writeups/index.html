@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
   <title>Writeups | Alberto Erbusti</title>
   <meta name="description" content="CTF and lab writeups by Alberto Erbusti — TryHackMe, HackTheBox, and CTF competitions.">
   <link rel="stylesheet" href="../style.css">
@@ -21,7 +22,7 @@
   <div class="page-header">
     <p class="page-header-label">writeups</p>
     <h1>Security Writeups</h1>
-    <p>Notes and solutions from CTFs, TryHackMe rooms, and HackTheBox machines.</p>
+    <p>Notes and solutions from CTFs, TryHackMe rooms, and HackTheBox machines. Written to learn, not just to document.</p>
   </div>
 
   <div class="layout">
@@ -49,6 +50,13 @@
           <div class="filter-right">
             <div class="dot dot-purple"></div>
             <span class="cnt" id="cnt-ctf">0</span>
+          </div>
+        </button>
+        <button class="filter-btn" data-filter="platform" data-value="owt">
+          <span>OverTheWire</span>
+          <div class="filter-right">
+            <div class="dot dot-amber"></div>
+            <span class="cnt" id="cnt-owt">0</span>
           </div>
         </button>
       </div>
