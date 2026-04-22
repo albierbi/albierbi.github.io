@@ -74,7 +74,7 @@ nmap -sU 10.10.219.78</pre>
           <div class="info-row"><span class="port">631 (UDP)</span><span class="service">IPP</span></div>
           <div class="info-row"><span class="port">5353 (UDP)</span><span class="service">mDNS / Zeroconf</span></div>
         </div>
-        <p>Only one HTTP port open on TCP. Navigating to <code>http://10.10.219.78:85</code> showed an image. Tried <code>steghide</code> on it but needed a passphrase — dead end for now.</p>
+        <p>Only one HTTP port open on TCP. Navigating to <code>http://10.10.219.78:85</code> showed an image. Tried <code>steghide</code> on it but needed a passphrase.</p>
       </section>
 
       <section id="web">
@@ -155,7 +155,7 @@ chmod +x linpeas.sh
 
       <section id="privesc">
         <h2>Privilege Escalation — Cronjob Hijacking</h2>
-        <p>Re-ran linpeas as <code>mario</code>. Found that <code>/etc/hosts</code> was writable by our user — unusual and suspicious.</p>
+        <p>Re-ran linpeas as <code>mario</code>. Found that <code>/etc/hosts</code> was writable by our user, very suspicious.</p>
         <p>Used <code>pspy</code> to monitor running processes without root:</p>
         <div class="code-block">
           <div class="code-label">bash</div>
@@ -195,7 +195,7 @@ nc -lvnp 9001</pre>
         <div class="callout callout-info">
           <div class="callout-title">Key lessons</div>
           <ul>
-            <li>Always check file upload restrictions — adding allowed extensions is a classic misconfiguration</li>
+            <li>Always check file upload restrictions, adding allowed extensions is a classic misconfiguration</li>
             <li><code>pspy</code> is essential for spotting cronjobs without root access</li>
             <li>Writable <code>/etc/hosts</code> + outbound cronjob = almost guaranteed root</li>
             <li><code>busybox nc</code> as a fallback when standard netcat lacks <code>-e</code></li>
