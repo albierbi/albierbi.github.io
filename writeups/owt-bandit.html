@@ -311,7 +311,7 @@ openssl s_client -connect localhost:&lt;correct_port&gt;</pre>
 
       <section id="lv19">
         <h2>Level 18 &rarr; 19</h2>
-        <p>The <code>.bashrc</code> has been modified to log you out immediately on login. Bypass it by not launching bash at all — pass a command directly to SSH.</p>
+        <p>The <code>.bashrc</code> has been modified to log you out immediately on login. Bypass it by not launching bash at all, pass a command directly to SSH.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre>ssh bandit18@bandit.labs.overthewire.org -p 2220 /bin/dash</pre>
@@ -337,7 +337,7 @@ openssl s_client -connect localhost:&lt;correct_port&gt;</pre>
 
       <section id="lv21">
         <h2>Level 20 &rarr; 21</h2>
-        <p><code>suconnect</code> connects to a port, expects to receive the current level's password, then returns the next one. You need to be both the server and client — set up a netcat listener first, then run suconnect against it.</p>
+        <p><code>suconnect</code> connects to a port, expects to receive the current level's password, then returns the next one. You need to be both the server and client; set up a netcat listener first, then run suconnect against it.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre># Terminal 1 — start listener with current password
@@ -361,7 +361,7 @@ cat /usr/bin/cronjob_bandit22.sh</pre>
 
       <section id="lv23">
         <h2>Level 22 &rarr; 23</h2>
-        <p>Another cronjob — this one writes the password to a file whose name is derived from a bash script. Read the script, understand what filename it generates, then read that file.</p>
+        <p>This cronjob writes the password to a file whose name is derived from a bash script. Read the script, understand what filename it generates, then read that file.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre>cat /usr/bin/cronjob_bandit23.sh
@@ -414,7 +414,7 @@ done | nc localhost 30002 | grep -v "Wrong"</pre>
 
       <section id="lv26">
         <h2>Level 25 &rarr; 26</h2>
-        <p>Bandit26's shell is not <code>/bin/bash</code> — check <code>/etc/passwd</code> to see it's set to <code>more</code>, which reads and exits immediately. To get a shell, shrink your terminal window to just 2 lines so <code>more</code> pauses, then use its <code>v</code> command to open vim, and from vim set the shell and spawn it.</p>
+        <p>Bandit26's shell is not <code>/bin/bash</code>, check <code>/etc/passwd</code> to see it's set to <code>more</code>, which reads and exits immediately. To get a shell, shrink your terminal window to just 2 lines so <code>more</code> pauses, then use its <code>v</code> command to open vim, and from vim set the shell and spawn it.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre># Shrink terminal to ~2 lines, then SSH in
@@ -448,7 +448,7 @@ cat repo/README</pre>
 
       <section id="lv29">
         <h2>Level 28 &rarr; 29</h2>
-        <p>The password in the repo has been redacted. Check the commit history — it was there before.</p>
+        <p>The password in the repo has been redacted. Check the commit history, it was there before.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre>git log
@@ -456,7 +456,7 @@ git show &lt;commit_hash&gt;</pre>
         </div>
         <div class="callout callout-info">
           <div class="callout-title">Lesson</div>
-          <p>Sensitive data committed to git is never truly deleted — it lives in the history. <code>git log</code> shows all commits, <code>git show &lt;hash&gt;</code> shows what a specific commit contained.</p>
+          <p>Sensitive data committed to git is never truly deleted. <code>git log</code> shows all commits, <code>git show &lt;hash&gt;</code> shows what a specific commit contained.</p>
         </div>
       </section>
 
@@ -483,7 +483,7 @@ git show &lt;tag_name&gt;</pre>
 
       <section id="lv32">
         <h2>Level 31 &rarr; 32</h2>
-        <p>Push a specific file to the remote repository. The <code>.gitignore</code> blocks <code>*.txt</code> — force-add it anyway.</p>
+        <p>Push a specific file to the remote repository. The <code>.gitignore</code> blocks <code>*.txt</code>, force-add it anyway.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre>echo "May I come in?" > key.txt
@@ -495,7 +495,7 @@ git push origin master</pre>
 
       <section id="lv33">
         <h2>Level 32 &rarr; 33</h2>
-        <p>Dropped into an uppercase shell — every command you type gets uppercased, breaking everything. The trick: use a shell variable that references the shell itself.</p>
+        <p>Dropped into an uppercase shell, every command you type gets uppercased, breaking everything. Use a shell variable that references the shell itself.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre>$0
