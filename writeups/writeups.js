@@ -25,7 +25,16 @@ const writeups = [
     tags: ["linux", "bash", "ssh", "git", "crypto", "shell-escape"],
     date: "2026-04-20",
     href: "owt-bandit.html"
-  }
+  },
+  {
+  title: "Publisher",
+  platform: "thm",
+  difficulty: "easy",
+  desc: "SPIP CMS RCE via known CVE, SSH key exfiltration for a stable shell, AppArmor policy bypass, and root via PATH injection on a SUID binary.",
+  tags: ["web", "spip", "rce", "metasploit", "ssh", "apparmor", "suid", "path-injection"],
+  date: "2026-04-25",
+  href: "thm-publisher.html"
+ }
 ];
 
 const platformLabel = { thm: "TryHackMe", htb: "HackTheBox", ctf: "CTF", owt: "OverTheWire" };
