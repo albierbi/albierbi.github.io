@@ -151,7 +151,7 @@ ssh -i think_id_rsa think@10.10.248.7</pre>
           <div class="callout-title">AppArmor analysis</div>
           <p>The profile denied listing <code>/opt</code> but explicitly allowed writes to <code>/var/tmp</code>. Direct reads of known paths still worked, so <code>/opt/run_container.sh</code> was readable even without being able to list the directory.</p>
         </div>
-        <p>Reading the script revealed that it calls <code>docker</code> without an absolute path — just the bare command name. This is a classic PATH injection target.</p>
+        <p>Reading the script revealed that it calls <code>docker</code> without an absolute path, just the bare command name. This is a classic PATH injection target.</p>
         <div class="code-block">
           <div class="code-label">bash</div>
           <pre># Prepend /var/tmp to PATH
@@ -176,9 +176,9 @@ chmod +x /var/tmp/docker
           <div class="callout-title">Key lessons</div>
           <ul>
             <li>Version disclosure in config files (<code>config.txt</code>, log files) is often the fastest path to a known CVE</li>
-            <li>When a public exploit fails, check the actual server error logs — <code>/tmp/spip.log</code> told us exactly what the filter rejected</li>
-            <li>AppArmor restricts listing but not necessarily reading — knowing a full path is enough to access a file</li>
-            <li>SUID binaries calling commands without absolute paths are PATH injection targets — always check the source script</li>
+            <li>When a public exploit fails, check the actual server error logs. <code>/tmp/spip.log</code> told us exactly what the filter rejected</li>
+            <li>AppArmor restricts listing but not necessarily reading, knowing a full path is enough to access a file</li>
+            <li>SUID binaries calling commands without absolute paths are PATH injection targets, always check the source script</li>
             <li><code>bash -p</code> preserves SUID privileges; without it, bash would drop them on startup</li>
           </ul>
         </div>
