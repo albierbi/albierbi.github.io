@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
   <title>Alberto Erbusti | Security & CS</title>
   <meta name="description" content="CS Student & Cybersecurity enthusiast. Building skills in security, systems, and software.">
   <link rel="stylesheet" href="style.css">
@@ -92,68 +93,57 @@
       <div class="section-divider"></div>
       <div class="writeups-preview-grid">
 
-      <a class="writeup-card" href="writeups/thm-mkingdom.html">
-      <div class="card-top">
-    <span class="platform-badge badge-thm">TryHackMe</span>
-    <span class="diff-badge diff-medium">medium</span>
-  </div>
-  <div class="card-title">mKingdom</div>
-  <div class="card-desc">PHP reverse shell via CMS file upload misconfiguration, lateral movement through plaintext creds found with linpeas, root via cronjob hijacking through /etc/hosts poisoning.</div>
-  <div class="card-tags">
-    <span class="tag">web</span>
-    <span class="tag">php</span>
-    <span class="tag">reverse-shell</span>
-    <span class="tag">linpeas</span>
-    <span class="tag">privesc</span>
-    <span class="tag">cronjob</span>
-  </div>
-</a>
+        <a class="writeup-card" href="writeups/thm-publisher.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Publisher</div>
+          <div class="card-desc">SPIP CMS RCE via known CVE, SSH key exfiltration for a stable shell, AppArmor policy bypass, and root via PATH injection on a SUID binary.</div>
+          <div class="card-tags">
+            <span class="tag">web</span>
+            <span class="tag">rce</span>
+            <span class="tag">apparmor</span>
+            <span class="tag">suid</span>
+            <span class="tag">path-injection</span>
+          </div>
+        </a>
 
-  <a class="writeup-card" href="writeups/thm-basic-pentesting.html">
-  <div class="card-top">
-    <span class="platform-badge badge-thm">TryHackMe</span>
-    <span class="diff-badge diff-easy">easy</span>
-  </div>
-  <div class="card-title">Basic Pentesting</div>
-  <div class="card-desc">Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.</div>
-  <div class="card-tags">
-    <span class="tag">enum</span>
-    <span class="tag">ssh</span>
-    <span class="tag">hydra</span>
-    <span class="tag">john</span>
-    <span class="tag">privesc</span>
-  </div>
-</a>
+        <a class="writeup-card" href="writeups/thm-mkingdom.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-medium">medium</span>
+          </div>
+          <div class="card-title">mKingdom</div>
+          <div class="card-desc">PHP reverse shell via CMS file upload misconfiguration, lateral movement through plaintext creds found with linpeas, root via cronjob hijacking through /etc/hosts poisoning.</div>
+          <div class="card-tags">
+            <span class="tag">web</span>
+            <span class="tag">php</span>
+            <span class="tag">reverse-shell</span>
+            <span class="tag">privesc</span>
+            <span class="tag">cronjob</span>
+          </div>
+        </a>
 
-       
+        <a class="writeup-card" href="writeups/thm-basic-pentesting.html">
+          <div class="card-top">
+            <span class="platform-badge badge-thm">TryHackMe</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Basic Pentesting</div>
+          <div class="card-desc">Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.</div>
+          <div class="card-tags">
+            <span class="tag">enum</span>
+            <span class="tag">ssh</span>
+            <span class="tag">hydra</span>
+            <span class="tag">john</span>
+            <span class="tag">privesc</span>
+          </div>
+        </a>
+
       </div>
       <div class="writeups-cta">
         <a href="/writeups" class="btn btn-ghost">All writeups &rarr;</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <div class="reveal">
-      <p class="section-label">contact</p>
-      <h2 class="section-title">Get in touch</h2>
-      <div class="section-divider"></div>
-      <p class="contact-intro">
-        Open to connecting with people in the security community, study groups, or anyone who wants to talk shop.
-      </p>
-      <div class="contact-links">
-        <a class="contact-link" href="www.linkedin.com/in/albertoerbusti" target="_blank" rel="noopener noreferrer">
-          <span class="link-icon">[in]</span>
-          <span>LinkedIn</span>
-        </a>
-        <a class="contact-link" href="https://github.com/albierbi" target="_blank" rel="noopener noreferrer">
-          <span class="link-icon">{gh}</span>
-          <span>GitHub</span>
-        </a>
-        <a class="contact-link" href="https://tryhackme.com/p/albierbi" target="_blank" rel="noopener noreferrer">
-          <span class="link-icon">[thm]</span>
-          <span>TryHackMe</span>
-        </a>
       </div>
     </div>
   </section>
