@@ -648,6 +648,8 @@ section {
 
 .footer-back:hover { text-decoration: underline; }
 
+#projects { border-top: 1px solid var(--border); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   nav { padding: 0 1.25rem; }
