@@ -27,6 +27,15 @@ const writeups = [
     href: "owt-bandit.html"
   },
   {
+  title: "Vaccine",
+  platform: "htb",
+  difficulty: "easy",
+  desc: "Anonymous FTP leaks a zip cracked with zip2john. MD5 hash in PHP source gives web access, sqlmap OS shell via SQLi, then root through a vi GTFOBins escape on a misconfigured sudo rule.",
+  tags: ["ftp", "hash-cracking", "sqli", "sqlmap", "sudo", "gtfobins", "privesc"],
+  date: "2026-04-25",
+  href: "htb-vaccine.html"
+  },
+  {
   title: "Publisher",
   platform: "thm",
   difficulty: "easy",
