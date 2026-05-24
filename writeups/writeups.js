@@ -27,6 +27,15 @@ const writeups = [
     href: "owt-bandit.html"
   },
   {
+  title: "Reactor",
+  platform: "htb",
+  difficulty: "easy",
+  desc: "Node.js RCE via CVE for initial access, chisel for port forwarding without SSH credentials, then root through the Node.js inspector debug console running as root.",
+  tags: ["node.js", "rce", "cve", "chisel", "port-forwarding", "inspector", "privesc"],
+  date: "2026-05-24",
+  href: "htb-reactor.html"
+  },
+  {
   title: "Vaccine",
   platform: "htb",
   difficulty: "easy",
