@@ -13,31 +13,32 @@
   <nav>
     <a class="nav-logo" href="#"><span>~/</span>albierbi</a>
     <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="/writeups">Writeups</a></li>
-      <li><a href="/projects.html">Projects</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="#about">about</a></li>
+      <li><a href="/writeups">writeups</a></li>
+      <li><a href="/projects.html">projects</a></li>
+      <li><a href="contact.html">contact</a></li>
     </ul>
   </nav>
 
   <section id="hero">
-    <div class="hero-grid"></div>
-    <div class="hero-glow"></div>
     <div class="hero-content">
-      <p class="hero-tag">CS Student &amp; Security Enthusiast</p>
-      <h1 class="hero-name">
-        <span class="first">Alberto</span><br>
-        <span class="last">Erbusti</span>
-      </h1>
+      <p class="hero-prompt"><span>albierbi@kali</span>:~$ whoami</p>
+
+      <div class="hero-block">
+        <p class="hero-cmd">cat info.txt</p>
+        <h1 class="hero-name">Alberto Erbusti<span class="cursor"></span></h1>
+      </div>
+
       <p class="hero-sub">
-        Studying Computer Science with a focus on cybersecurity.
-        Building knowledge in systems, networks, and offensive security.
+        CS student, cybersecurity focus. Learning by doing -- labs, CTFs, and code.
       </p>
+
       <div class="hero-actions">
-        <a href="/writeups" class="btn btn-primary">View Writeups &rarr;</a>
-        <a href="#about" class="btn btn-ghost">About me</a>
+        <a href="/writeups" class="btn btn-primary">writeups/</a>
+        <a href="#about" class="btn btn-ghost">--about</a>
       </div>
     </div>
+
     <div class="hero-status">
       <div class="status-item">
         <div class="status-dot"></div>
@@ -58,17 +59,16 @@
       <div class="about-grid">
         <div class="about-text">
           <p>
-            I'm a 23-year-old originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
-            I'm pursuing a remote Bachelor's in Computer Science with a focus on cybersecurity,
+            23 years old, originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
+            Pursuing a remote BSc in Computer Science with a focus on cybersecurity,
             coming from an engineering background.
           </p>
           <p>
-            My approach to security is hands-on: labs, CTFs, and writeups
-            rather than just theory.
+            My approach is hands-on: labs, CTFs, and writeups rather than theory alone.
           </p>
           <p>
-            Currently working through OS internals, algorithms, and discrete math,
-            while exploring the offensive side of security in my own time.
+            Currently working through discrete math and algorithms while exploring
+            offensive security in my own time.
           </p>
         </div>
         <div>
@@ -144,39 +144,41 @@
 
       </div>
       <div class="writeups-cta">
-        <a href="/writeups" class="btn btn-ghost">All writeups &rarr;</a>
+        <a href="/writeups" class="btn btn-ghost">ls writeups/ &rarr;</a>
       </div>
     </div>
   </section>
-<section id="projects">
-  <div class="reveal">
-    <p class="section-label">projects</p>
-    <h2 class="section-title">Projects</h2>
-    <div class="section-divider"></div>
-    <div class="writeups-preview-grid">
 
-      <a class="writeup-card" href="https://zerodaymorning.dev" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <span class="platform-badge" style="background:#0a1a0a;color:#e8ff47;border:1px solid #2a4a0a;">Live Project</span>
-          <span class="diff-badge" style="color:#e8ff47;background:#1a1a00;">Node.js</span>
-        </div>
-        <div class="card-title">Zero-Day Morning</div>
-        <div class="card-desc">A daily cybersecurity briefing site. One AI-generated brief per day covering real breaches, CVEs, CTF techniques, and more. Built with Node.js, Upstash Redis, and Vercel.</div>
-        <div class="card-tags">
-          <span class="tag">node.js</span>
-          <span class="tag">redis</span>
-          <span class="tag">vercel</span>
-          <span class="tag">api</span>
-          <span class="tag">cron</span>
-        </div>
-      </a>
+  <section id="projects">
+    <div class="reveal">
+      <p class="section-label">projects</p>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-divider"></div>
+      <div class="writeups-preview-grid">
 
+        <a class="writeup-card" href="https://zerodaymorning.dev" target="_blank" rel="noopener noreferrer">
+          <div class="card-top">
+            <span class="platform-badge badge-htb">live</span>
+            <span class="diff-badge" style="color:var(--yellow);border:1px solid #4a3a00;">node.js</span>
+          </div>
+          <div class="card-title">Zero-Day Morning</div>
+          <div class="card-desc">A daily cybersecurity briefing. One AI-generated brief per day covering real breaches, CVEs, CTF techniques, and more. Node.js, Upstash Redis, Vercel.</div>
+          <div class="card-tags">
+            <span class="tag">node.js</span>
+            <span class="tag">redis</span>
+            <span class="tag">vercel</span>
+            <span class="tag">api</span>
+            <span class="tag">cron</span>
+          </div>
+        </a>
+
+      </div>
+      <div class="writeups-cta">
+        <a href="/projects.html" class="btn btn-ghost">ls projects/ &rarr;</a>
+      </div>
     </div>
-    <div class="writeups-cta">
-      <a href="/projects.html" class="btn btn-ghost">All projects &rarr;</a>
-    </div>
-  </div>
-</section>
+  </section>
+
   <footer>
     <span>&copy; 2026 Alberto Erbusti</span>
     <span class="accent-text">albertoerbusti.com</span>
