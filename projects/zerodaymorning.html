@@ -202,7 +202,6 @@ brief:last-generated   -> ISO timestamp of last generation</pre>
         <h2>Where I used AI</h2>
         <p>I built this whole project through a chat with Claude, going back and forth on decisions, pasting error messages, and fixing things step by step as they broke. A lot of the actual code, the API routes, the Redis logic, the cron config, the CSS, came out of that conversation rather than me writing every line from scratch.</p>
         <p>What was mine: deciding to build this in the first place, picking the stack, debugging live production issues by reading error logs and describing what I saw, deciding to switch to Upstash Redis when the JSON file approach didn't work on serverless, and deciding to separate generation from serving once I understood why that mattered for cost. The system prompt for the daily brief is also mine, including the writing style rules.</p>
-        <p>I'm being upfront about this because I think it matters. This wasn't me copying a tutorial, it was me directing a build, hitting real bugs in a live deployment, and learning the underlying concepts by fixing them rather than reading about them in the abstract.</p>
       </section>
 
       <section id="takeaways">
