@@ -5,56 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
   <title>Projects | Alberto Erbusti</title>
-  <meta name="description" content="Projects built by Alberto Erbusti | CS student and cybersecurity enthusiast.">
+  <meta name="description" content="Projects built by Alberto Erbusti — CS student and cybersecurity enthusiast.">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
   <nav>
-    <a class="nav-logo" href="index.html"><span>~/</span>albierbi</a>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
     <ul class="nav-links">
-      <li><a href="../index.html#about">About</a></li>
-      <li><a href="../writeups/">Writeups</a></li>
-      <li><a href="/projects/" class="active">Projects</a></li>
-      <li><a href="../contact.html">Contact</a></li>
+      <li><a href="../index.html#about">about</a></li>
+      <li><a href="../writeups/">writeups</a></li>
+      <li><a href="/projects/" class="active">projects</a></li>
+      <li><a href="../contact.html">contact</a></li>
     </ul>
   </nav>
 
   <div class="page-header">
     <p class="page-header-label">projects</p>
     <h1>Things I've built</h1>
-    <p>Side projects, tools, and experiments. Some finished, some ongoing.</p>
+    <p>Build logs, not just descriptions. How it was made, what broke, what I learned.</p>
   </div>
 
-  <div class="layout" style="grid-template-columns: 1fr; max-width: 900px;">
-    <main class="main" style="padding-top: 2.5rem;">
-      <div class="cards-grid">
+  <div style="max-width:860px;margin:0 auto;padding:2rem 2rem 5rem;">
+    <div class="cards-grid">
 
-        <a class="card" href="https://zerodaymorning.dev" target="_blank" rel="noopener noreferrer">
-          <div class="card-top">
-            <span class="platform-badge" style="background:#0a1a0a;color:#e8ff47;border:1px solid #2a4a0a;">Live</span>
-            <span class="diff-badge" style="color:#e8ff47;background:#1a1a00;">Node.js</span>
-          </div>
-          <div class="card-title">Zero-Day Morning</div>
-          <div class="card-desc">
-            I felt the need to try and learn everyday something new, so instead of asking everytime to Claude, i thought that making it accessible to everyone would've been even cooler. Built with a Node.js backend, Upstash Redis for storage, and deployed on Vercel with a daily cron job. Archive with search and difficulty filters.
-          </div>
-          <div class="card-tags">
-            <span class="tag">node.js</span>
-            <span class="tag">express</span>
-            <span class="tag">redis</span>
-            <span class="tag">vercel</span>
-            <span class="tag">anthropic api</span>
-            <span class="tag">cron</span>
-          </div>
-          <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>zerodaymorning.dev</span>
-            <a href="https://github.com/albierbi/zerodaymorning" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-family:var(--mono);font-size:11px;" onclick="event.stopPropagation()">github &rarr;</a>
-          </div>
-        </a>
+      <a class="card" href="honeypot.html">
+        <div class="card-top">
+          <span class="platform-badge badge-htb">decommissioned</span>
+          <span class="diff-badge diff-medium">75 days live</span>
+        </div>
+        <div class="card-title">Honeypot on a Public VPS</div>
+        <div class="card-desc">Dockerized SSH and HTTP honeypot running on DigitalOcean for 75 days. Cowrie, custom Python HTTP trap, Promtail, Loki, Grafana. 1.87M events logged. The internet showed up immediately.</div>
+        <div class="card-tags">
+          <span class="tag">docker</span>
+          <span class="tag">cowrie</span>
+          <span class="tag">loki</span>
+          <span class="tag">grafana</span>
+          <span class="tag">python</span>
+          <span class="tag">digital-ocean</span>
+        </div>
+        <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>2026-05-25 to 2026-08-08</span>
+          <span style="color:var(--accent);">github.com/albierbi/honeypot</span>
+        </div>
+      </a>
 
-      </div>
-    </main>
+      <a class="card" href="zerodaymorning.html">
+        <div class="card-top">
+          <span class="platform-badge badge-htb">live</span>
+          <span class="diff-badge" style="color:var(--yellow);border:1px solid #4a3a00;">node.js</span>
+        </div>
+        <div class="card-title">Zero-Day Morning</div>
+        <div class="card-desc">A daily cybersecurity briefing site. One AI-generated brief per day covering real breaches, CVEs, CTF techniques, and more. Node.js backend, Upstash Redis, Vercel cron job.</div>
+        <div class="card-tags">
+          <span class="tag">node.js</span>
+          <span class="tag">express</span>
+          <span class="tag">redis</span>
+          <span class="tag">vercel</span>
+          <span class="tag">anthropic api</span>
+          <span class="tag">cron</span>
+        </div>
+        <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>zerodaymorning.dev</span>
+          <span style="color:var(--accent);">github.com/albierbi/zerodaymorning</span>
+        </div>
+      </a>
+
+    </div>
   </div>
 
   <footer>
@@ -62,7 +79,7 @@
     <a href="../index.html" class="footer-back">&larr; back home</a>
   </footer>
 
-  <script src="main.js"></script>
+  <script src="../main.js"></script>
 
 </body>
 </html>

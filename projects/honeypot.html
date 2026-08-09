@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
+  <title>Honeypot on a Public VPS | Alberto Erbusti</title>
+  <meta name="description" content="75 days of running a public honeypot. 1.87M events, real botnets, Outlaw persistence attempts, and a Loki compactor that ate my dashboard history.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../writeup.css">
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="../index.html"><span>~/</span>albierbi</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">about</a></li>
+      <li><a href="../writeups/">writeups</a></li>
+      <li><a href="/projects/" class="active">projects</a></li>
+      <li><a href="../contact.html">contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="writeup-hero">
+    <div class="writeup-hero-inner">
+      <div class="writeup-back">
+        <a href="/projects/">all projects</a>
+      </div>
+      <div class="writeup-meta-top">
+        <span class="platform-badge badge-htb">decommissioned</span>
+        <span class="diff-badge diff-medium">75 days live</span>
+      </div>
+      <h1 class="writeup-title">Honeypot on a Public VPS</h1>
+      <p class="writeup-subtitle">I put a fake SSH server on the open internet and logged everything for 75 days. Here's what showed up, and how the stack was built.</p>
+      <div class="writeup-tags">
+        <span class="tag">docker</span>
+        <span class="tag">cowrie</span>
+        <span class="tag">fastapi</span>
+        <span class="tag">promtail</span>
+        <span class="tag">loki</span>
+        <span class="tag">grafana</span>
+        <span class="tag">digital-ocean</span>
+        <span class="tag">ubuntu 22.04</span>
+      </div>
+      <div class="writeup-date">2026-05-25 to 2026-08-08 &mdash; <a href="https://github.com/albierbi/honeypot" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;">github.com/albierbi/honeypot</a></div>
+    </div>
+  </div>
+
+  <div class="writeup-body">
+
+    <aside class="writeup-toc">
+      <div class="toc-label">// contents</div>
+      <ul>
+        <li><a href="#why">Why</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#tuning">Tuning Loki</a></li>
+        <li><a href="#results">75-day haul</a></li>
+        <li><a href="#ssh-attacks">SSH attacks</a></li>
+        <li><a href="#http-attacks">HTTP attacks</a></li>
+        <li><a href="#botnets">Botnets</a></li>
+        <li><a href="#malware">Malware</a></li>
+        <li><a href="#ai">Where I used AI</a></li>
+        <li><a href="#takeaways">Takeaways</a></li>
+      </ul>
+    </aside>
+
+    <article class="writeup-content">
+
+      <section id="why">
+        <h2>Why</h2>
+        <p>I wanted to see what actually happens when you expose a server to the internet with nothing protecting it. Not theory, real traffic. So I got a cheap VPS, put a fake SSH server on it, logged everything, and waited.</p>
+        <p>I also wanted something in my portfolio that wasn't another CTF writeup. A dashboard full of real attack data against a box I set up myself felt like a better way to show I understand this stuff, not just that I can follow a walkthrough.</p>
+      </section>
+
+      <section id="stack">
+        <h2>Stack</h2>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">Cowrie</span><span class="service">Medium-interaction SSH honeypot. Fakes a shell, logs every command typed</span></div>
+          <div class="info-row"><span class="port">Python / FastAPI</span><span class="service">Custom HTTP honeypot on port 80, logs all requests and headers</span></div>
+          <div class="info-row"><span class="port">Promtail</span><span class="service">Ships JSON logs from both honeypots to Loki</span></div>
+          <div class="info-row"><span class="port">Loki</span><span class="service">Log aggregation and storage</span></div>
+          <div class="info-row"><span class="port">Grafana</span><span class="service">Dashboards: attack map, timelines, top usernames, commands</span></div>
+          <div class="info-row"><span class="port">Docker Compose</span><span class="service">Runs the whole stack on a single $6/mo droplet</span></div>
+        </div>
+        <p>VPS specs: 1 GB RAM, 1 vCPU, Ubuntu 22.04. That's the smallest DigitalOcean droplet that can run this without constantly getting OOM-killed, and even then it took some tuning to get there.</p>
+      </section>
+
+      <section id="architecture">
+        <h2>Architecture</h2>
+        <p>Both honeypots write JSON logs to disk. Promtail tails those files and ships them to Loki. Grafana queries Loki. All of it runs in Docker so the whole thing deploys with one command.</p>
+        <div class="code-block">
+          <div class="code-label">architecture</div>
+          <pre>Cowrie (SSH :22)  +  Python HTTP (:80)
+         |                    |
+         +------+  JSON  +----+
+                |
+            Promtail
+                |
+              Loki
+                |
+            Grafana (:3000)</pre>
+        </div>
+        <p>Before deploying, I moved real SSH access to port 443. Attackers almost never probe that port for SSH, and it stays open through most restrictive firewalls. That kept the box manageable while Cowrie owned port 22.</p>
+      </section>
+
+      <section id="setup">
+        <h2>Setup</h2>
+        <p>After provisioning the droplet and installing Docker, the deploy is just:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>git clone https://github.com/albierbi/honeypot.git
+cd honeypot
+cp .env.example .env
+nano .env          # set Grafana password
+mkdir -p logs/cowrie logs/http
+docker compose up -d</pre>
+        </div>
+        <p>Grafana comes up at <code>http://VPS_IP:3000</code>. The dashboard is provisioned automatically from the repo, no manual panel setup needed.</p>
+        <div class="callout callout-warning">
+          <div class="callout-title">Important</div>
+          <p>Never run this on a machine you use for anything else. Cowrie is a sandbox but nothing is bulletproof. Dedicate a throwaway VPS to it.</p>
+        </div>
+      </section>
+
+      <section id="tuning">
+        <h2>Tuning Loki</h2>
+        <p>This is the part no tutorial covers. The stack does not just work on 1 GB of RAM. A few things broke in ways that took a while to figure out.</p>
+
+        <h3>The disappearing history problem</h3>
+        <p>Loki's default compactor rewrites its index every 10 minutes or so. On a single-node setup this orphaned older chunks from the query path until the next restart, so dashboard history would silently vanish, then come back after a container restart. The fix was to basically disable the compactor:</p>
+        <div class="code-block">
+          <div class="code-label">loki/config.yml</div>
+          <pre>compactor:
+  compaction_interval: 8760h  # effectively disabled</pre>
+        </div>
+
+        <h3>OOM kills</h3>
+        <p>Loki's default parallelism settings assume more RAM than a $6 droplet has. It kept getting killed mid-query, taking the dashboard down with it.</p>
+        <div class="code-block">
+          <div class="code-label">loki/config.yml</div>
+          <pre>limits_config:
+  max_query_parallelism: 2
+  max_concurrent: 2
+  max_query_length: 8760h   # allow 6-month dashboard panels</pre>
+        </div>
+
+        <h3>Log re-ingestion on restart</h3>
+        <p>Promtail tracks which log lines it already shipped using a positions file. If that file isn't persisted across container restarts, it re-ingests everything from the start on every deploy, which means duplicated data and inflated numbers. Fixed with a Docker volume mount for the positions file.</p>
+        <p>All of this is already in the repo config. Writing it down here so I remember why it's there.</p>
+      </section>
+
+      <section id="results">
+        <h2>75-day haul</h2>
+        <p>Between 2026-05-25 and 2026-08-08:</p>
+        <div class="info-grid">
+          <div class="info-row"><span class="port">1,867,564</span><span class="service">total events logged</span></div>
+          <div class="info-row"><span class="port">352,541</span><span class="service">SSH connection attempts</span></div>
+          <div class="info-row"><span class="port">7,038</span><span class="service">unique attacker IPs (SSH)</span></div>
+          <div class="info-row"><span class="port">347,818</span><span class="service">failed logins</span></div>
+          <div class="info-row"><span class="port">4,025</span><span class="service">logins Cowrie faked accepting</span></div>
+          <div class="info-row"><span class="port">39,788</span><span class="service">shell commands run inside the sandbox</span></div>
+          <div class="info-row"><span class="port">2,810</span><span class="service">malware download attempts (14 unique payloads)</span></div>
+          <div class="info-row"><span class="port">95,736</span><span class="service">HTTP requests</span></div>
+          <div class="info-row"><span class="port">3,947</span><span class="service">unique attacker IPs (HTTP)</span></div>
+        </div>
+        <p>The first SSH attempt landed 47 seconds after the box went live. Scanners are everywhere and they're fast.</p>
+      </section>
+
+      <section id="ssh-attacks">
+        <h2>SSH attacks</h2>
+        <p>The credentials attackers tried were almost comically predictable. <code>root</code> alone was tried more than every other username combined.</p>
+
+        <h3>Top usernames</h3>
+        <div class="code-block">
+          <div class="code-label">attempts / username</div>
+          <pre>132,830   root
+ 17,281   admin
+  7,760   user
+  7,149   ubuntu
+  4,313   test
+  3,932   deploy
+  2,269   debian
+  2,157   ftpuser
+  2,025   pi</pre>
+        </div>
+
+        <h3>Top passwords</h3>
+        <div class="code-block">
+          <div class="code-label">attempts / password</div>
+          <pre>19,402   123456
+ 9,135   123
+ 7,345   1234
+ 5,831   password
+ 5,129   12345678
+ 4,323   root
+ 2,076   3245gs5662d34
+ 1,925   345gs5662d34
+ 1,619   P@ssw0rd
+ 1,445   toor</pre>
+        </div>
+        <p>Those two <code>345gs5662d34</code> style entries are known Mirai IoT botnet default credentials. That worm first spread in 2016 and is apparently still crawling the internet a decade later.</p>
+
+        <h3>What attackers ran once they were "in"</h3>
+        <p>Most sessions started with basic recon:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>uname -a
+cat /proc/cpuinfo | grep name | wc -l
+free -m
+crontab -l</pre>
+        </div>
+        <p>Then the most interesting single command, run 1,990 times word for word:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>cd ~ && rm -rf .ssh && mkdir .ssh && \
+  echo "ssh-rsa AAAAB3Nz...mdrfckr" >> .ssh/authorized_keys && \
+  chmod -R go= ~/.ssh</pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-title">The Outlaw botnet</div>
+          <p>The <code>mdrfckr</code> tag on that SSH key is a known calling card of the Outlaw IoT botnet. Nearly 2,000 different compromised machines pasted the exact same command into the fake shell.</p>
+        </div>
+        <p>786 attackers ran this cleanup command first, which is bots killing other bots' malware before installing their own:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre>rm -rf /tmp/secure.sh; rm -rf /tmp/auth.sh;
+pkill -9 secure.sh; pkill -9 auth.sh;
+echo > /etc/hosts.deny; pkill -9 sleep;</pre>
+        </div>
+        <p>There's basically a turf war happening on thousands of abandoned servers at once, and the owners have no idea.</p>
+      </section>
+
+      <section id="http-attacks">
+        <h2>HTTP attacks</h2>
+        <p>The HTTP honeypot logged 95,736 requests from 3,947 unique IPs. Almost every non-root path was hunting for leaked secrets:</p>
+        <div class="code-block">
+          <div class="code-label">requests / path</div>
+          <pre>9,284   /
+2,821   /.env
+  910   /vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php
+  646   /.git/config
+  511   /index.php
+  475   /SDK/webLanguage
+  457   /app/.env
+  441   /.env.production
+  437   /api/.env
+  413   /.env.prod</pre>
+        </div>
+        <div class="callout callout-warning">
+          <div class="callout-title">CVE-2017-9841</div>
+          <p>The phpunit path is a 9-year-old RCE vulnerability. It still got 910 attempts. Anything exposed on port 80 gets probed for it almost immediately.</p>
+        </div>
+        <p>Scanners try dozens of <code>.env</code> variants: <code>/laravel/.env</code>, <code>/.env.old</code>, <code>/.env.save</code>, <code>/.env.backup</code>. One leaked API key pays for scanning millions of IPs.</p>
+      </section>
+
+      <section id="botnets">
+        <h2>Botnets</h2>
+        <p>The SSH client version field tells you what's actually on the other end:</p>
+        <div class="code-block">
+          <div class="code-label">connections / client version / meaning</div>
+          <pre>245,400   SSH-2.0-Go              Custom Go scanner, dominant Chinese IoT botnet
+ 70,610   SSH-2.0-libssh_0.9.6   Another botnet flavor
+  4,480   SSH-2.0-PuTTY_0.84     Actual humans on Windows
+    324   SSH-2.0-Nmap-SSH2       Nmap scans
+    281   SSH-2.0-ZGrab           Censys-adjacent research scanners</pre>
+        </div>
+        <p>69% of all connections were the exact same Go scanner. The top single attacker, an IP out of Thailand (110.77.221.154), made 89,206 login attempts on its own over 75 days. Humans and researchers combined were a rounding error.</p>
+      </section>
+
+      <section id="malware">
+        <h2>Malware payloads</h2>
+        <p>Attackers tried to download binaries 2,810 times across 14 unique payloads. Sample names from the logs:</p>
+        <div class="code-block">
+          <div class="code-label">payload names</div>
+          <pre>meow, meowarm64          -> likely Mirai variant
+morte.x86, morte.mips,
+morte.arc, morte.i468    -> cross-arch IoT malware
+xnxnxnxnxnxnxn...aarch64 -> Gafgyt variant</pre>
+        </div>
+        <p>The arm64, mips, arc, and aarch64 suffixes give it away. These bots were built for routers and IoT devices, not servers. They just tried the same playbook against my box anyway.</p>
+      </section>
+
+      <section id="ai">
+        <h2>Where I used AI</h2>
+        <p>I used Claude Code throughout this project, mainly for the parts that weren't the point of the exercise. It helped debug the Loki compactor issue described above, which took a while to track down. It also helped write the README from the raw log data and talked through Grafana panel design with me when I wasn't sure how to visualize something.</p>
+        <p>Deciding on the stack, provisioning the VPS, setting up the actual honeypots, moving SSH to a different port, and analyzing what the logs meant, that part was me. AI was a tool for the boring or fiddly bits, not a replacement for understanding what I was building.</p>
+      </section>
+
+      <section id="takeaways">
+        <h2>Takeaways</h2>
+        <div class="callout callout-info">
+          <div class="callout-title">What I learned</div>
+          <ul>
+            <li>The internet probes anything exposed on port 22 within seconds, not minutes.</li>
+            <li>69% of SSH traffic came from one botnet family. The threat landscape is more concentrated than I expected.</li>
+            <li>Credential stuffing is almost entirely automated: the same password lists, the same usernames, across thousands of IPs at once.</li>
+            <li>HTTP scanners hunt for <code>.env</code> files obsessively. One exposed key is worth scanning millions of servers for.</li>
+            <li>Loki on a 1 GB VPS needs real tuning. The defaults assume more RAM than you probably have.</li>
+            <li>Moving real SSH to port 443 worked exactly as expected. Zero noise on that port for 75 days.</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <footer>
+    <span>&copy; 2026 Alberto Erbusti</span>
+    <a href="/projects/" class="footer-back">&larr; back to projects</a>
+  </footer>
+
+</body>
+</html>
