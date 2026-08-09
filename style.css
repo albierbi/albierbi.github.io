@@ -133,6 +133,16 @@ h2.section-title::before { content: '> '; color: var(--accent); }
   display: block;
   transition: border-color 0.15s;
 }
+.cards-grid .card,
+.cards-grid .writeup-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cards-grid .card-desc {
+  flex-grow: 1;
+}
 
 .card:hover,
 .writeup-card:hover {
