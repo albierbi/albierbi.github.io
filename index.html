@@ -4,41 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
-  <title>Alberto Erbusti | Security & CS</title>
-  <meta name="description" content="CS Student & Cybersecurity enthusiast. Building skills in security, systems, and software.">
+  <title>Alberto Erbusti</title>
+  <meta name="description" content="CS student focused on cybersecurity. Writeups, projects, and notes.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <nav>
-    <a class="nav-logo" href="#"><span>~/</span>albierbi</a>
+    <a class="nav-logo" href="/"><span>~/</span>albierbi</a>
     <ul class="nav-links">
       <li><a href="#about">about</a></li>
-      <li><a href="/writeups">writeups</a></li>
-      <li><a href="/projects">projects</a></li>
-      <li><a href="contact.html">contact</a></li>
+      <li><a href="/writeups/">writeups</a></li>
+      <li><a href="/projects/">projects</a></li>
+      <li><a href="/contact.html">contact</a></li>
     </ul>
   </nav>
 
   <section id="hero">
-    <div class="hero-content">
-      <p class="hero-prompt"><span>albierbi@kali</span>:~$ whoami</p>
-
-      <div class="hero-block">
-        <p class="hero-cmd">cat info.txt</p>
-        <h1 class="hero-name">Alberto Erbusti<span class="cursor"></span></h1>
-      </div>
-
-      <p class="hero-sub">
-        CS student, cybersecurity focus. Learning by doing labs, CTFs, and code.
-      </p>
-
-      <div class="hero-actions">
-        <a href="/writeups" class="btn btn-primary">writeups/</a>
-        <a href="#about" class="btn btn-ghost">--about</a>
-      </div>
+    <h1 class="hero-name">Alberto Erbusti</h1>
+    <p class="hero-sub">
+      CS student, cybersecurity focus. Based in Norway. I learn by building and
+      breaking things, then writing down what happened.
+    </p>
+    <div class="hero-actions">
+      <a href="/writeups/" class="btn btn-primary">Writeups</a>
+      <a href="/projects/" class="btn btn-ghost">Projects</a>
     </div>
-
+    <div class="hero-status">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>HTTPS enforced</span>
+      </div>
       <div class="status-item">
         <span class="accent-text">A+</span>
         <span>securityheaders.com</span>
@@ -48,13 +44,11 @@
 
   <section id="about">
     <div class="reveal">
-      <p class="section-label">about</p>
-      <h2 class="section-title">Who I am</h2>
-      <div class="section-divider"></div>
+      <h2 class="section-title">About</h2>
       <div class="about-grid">
         <div class="about-text">
           <p>
-            23 years old, originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
+            23, originally from <strong>Italy</strong>, currently based in <strong>Norway</strong>.
             Pursuing a remote BSc in Computer Science with a focus on cybersecurity,
             coming from an engineering background.
           </p>
@@ -72,9 +66,9 @@
             <div class="skill-item">Python</div>
             <div class="skill-item">Networking</div>
             <div class="skill-item">C</div>
-            <div class="skill-item">TryHackMe</div>
             <div class="skill-item">Wireshark</div>
             <div class="skill-item">Nmap</div>
+            <div class="skill-item">Docker</div>
             <div class="skill-item">Git</div>
           </div>
         </div>
@@ -84,12 +78,10 @@
 
   <section id="writeups">
     <div class="reveal">
-      <p class="section-label">writeups</p>
-      <h2 class="section-title">Latest writeups</h2>
-      <div class="section-divider"></div>
+      <h2 class="section-title">Recent writeups</h2>
       <div class="writeups-preview-grid">
 
-        <a class="writeup-card" href="writeups/thm-publisher.html">
+        <a class="writeup-card" href="/writeups/thm-publisher.html">
           <div class="card-top">
             <span class="platform-badge badge-thm">TryHackMe</span>
             <span class="diff-badge diff-easy">easy</span>
@@ -105,7 +97,23 @@
           </div>
         </a>
 
-        <a class="writeup-card" href="writeups/thm-mkingdom.html">
+        <a class="writeup-card" href="/writeups/htb-vaccine.html">
+          <div class="card-top">
+            <span class="platform-badge badge-htb">HackTheBox</span>
+            <span class="diff-badge diff-easy">easy</span>
+          </div>
+          <div class="card-title">Vaccine</div>
+          <div class="card-desc">Anonymous FTP leaks a zip cracked with zip2john. MD5 hash in PHP source gives web access, sqlmap OS shell via SQLi, then root through a vi GTFOBins escape.</div>
+          <div class="card-tags">
+            <span class="tag">ftp</span>
+            <span class="tag">sqli</span>
+            <span class="tag">sqlmap</span>
+            <span class="tag">sudo</span>
+            <span class="tag">gtfobins</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="/writeups/thm-mkingdom.html">
           <div class="card-top">
             <span class="platform-badge badge-thm">TryHackMe</span>
             <span class="diff-badge diff-medium">medium</span>
@@ -121,43 +129,41 @@
           </div>
         </a>
 
-        <a class="writeup-card" href="writeups/thm-basic-pentesting.html">
-          <div class="card-top">
-            <span class="platform-badge badge-thm">TryHackMe</span>
-            <span class="diff-badge diff-easy">easy</span>
-          </div>
-          <div class="card-title">Basic Pentesting</div>
-          <div class="card-desc">Enumeration with enum4linux and gobuster, SSH brute-force with Hydra, then privilege escalation by cracking an SSH key passphrase with john.</div>
-          <div class="card-tags">
-            <span class="tag">enum</span>
-            <span class="tag">ssh</span>
-            <span class="tag">hydra</span>
-            <span class="tag">john</span>
-            <span class="tag">privesc</span>
-          </div>
-        </a>
-
       </div>
       <div class="writeups-cta">
-        <a href="/writeups" class="btn btn-ghost">ls writeups/ &rarr;</a>
+        <a href="/writeups/" class="btn btn-ghost">All writeups</a>
       </div>
     </div>
   </section>
 
   <section id="projects">
     <div class="reveal">
-      <p class="section-label">projects</p>
       <h2 class="section-title">Projects</h2>
-      <div class="section-divider"></div>
       <div class="writeups-preview-grid">
 
-        <a class="writeup-card" href="https://zerodaymorning.dev" target="_blank" rel="noopener noreferrer">
+        <a class="writeup-card" href="/projects/honeypot.html">
           <div class="card-top">
-            <span class="platform-badge badge-htb">live</span>
-            <span class="diff-badge" style="color:var(--yellow);border:1px solid #4a3a00;">node.js</span>
+            <span class="platform-badge">decommissioned</span>
+            <span class="diff-badge">75 days live</span>
+          </div>
+          <div class="card-title">Honeypot on a Public VPS</div>
+          <div class="card-desc">Dockerized SSH and HTTP honeypot on DigitalOcean. Cowrie, a custom Python HTTP trap, Promtail, Loki, Grafana. 1.87M events logged over 75 days.</div>
+          <div class="card-tags">
+            <span class="tag">docker</span>
+            <span class="tag">cowrie</span>
+            <span class="tag">loki</span>
+            <span class="tag">grafana</span>
+            <span class="tag">python</span>
+          </div>
+        </a>
+
+        <a class="writeup-card" href="/projects/zerodaymorning.html">
+          <div class="card-top">
+            <span class="platform-badge">live</span>
+            <span class="diff-badge">node.js</span>
           </div>
           <div class="card-title">Zero-Day Morning</div>
-          <div class="card-desc">A daily cybersecurity briefing. One AI-generated brief per day covering real breaches, CVEs, CTF techniques, and more. Node.js, Upstash Redis, Vercel.</div>
+          <div class="card-desc">A daily cybersecurity briefing site. One AI-generated brief per day covering real breaches, CVEs, and CTF techniques. Node.js backend, Upstash Redis, Vercel cron job.</div>
           <div class="card-tags">
             <span class="tag">node.js</span>
             <span class="tag">redis</span>
@@ -169,14 +175,14 @@
 
       </div>
       <div class="writeups-cta">
-        <a href="/projects" class="btn btn-ghost">ls projects/ &rarr;</a>
+        <a href="/projects/" class="btn btn-ghost">All projects</a>
       </div>
     </div>
   </section>
 
   <footer>
     <span>&copy; 2026 Alberto Erbusti</span>
-    <span class="accent-text">albertoerbusti.com</span>
+    <span>albertoerbusti.com</span>
   </footer>
 
   <script src="main.js"></script>
