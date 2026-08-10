@@ -64,6 +64,7 @@ nav {
   font-size: 14px;
   color: var(--muted);
   text-decoration: none;
+  text-transform: lowercase;
 }
 
 .nav-links a:hover { color: var(--text); }
